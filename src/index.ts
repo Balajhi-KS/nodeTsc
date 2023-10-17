@@ -1,19 +1,44 @@
 // var express = require('express');
-import express, {Application, Request, Response, NextFunction} from 'express'
-import cors from 'cors'
-import bodyParser from 'body-parser'
+import express, { Application, Request, Response, NextFunction, Router, Express } from 'express'
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import { Routes } from './routes/v1';
+import * as dotenv from 'dotenv';
 
-const app = express()
-app.use(cors())
-app.use(bodyParser.json())
+import { sequelize } from './models';
+import { CONFIG } from './config/config';
+dotenv.config();
+class App {
+    public express: express.Application;
 
-app.get('/', (req, res) => {
-    res.send('Heylo') 
-})
+    // public routes: Routes;
+    constructor() {
+        this.express = express();
+        this.mountRoutes();
+        this.express.use(cors());
+        this.express.use(bodyParser.json());
+        this.express.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/api/post', (req, res) => {
-    console.log(req.body)
-    res.send(req.body)
-})
+    }
+    private mountRoutes(): void {
+        this.express.use(function (req: Request, res: Response, next: NextFunction) {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+            res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization, Content-Type');
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+            next();
+        });
 
-app.listen(3000, () => {console.log('Listening to 5000')}) 
+        this.express.use('/v1', new Routes().routers);
+        console.log(process.env.PORT, this.express.get('host'));
+        sequelize.authenticate().then(() => {
+            console.log('Connected to SQL database:', CONFIG.db_name);
+        }).catch(err => {
+            console.error('Unable to connect to SQL database:', CONFIG.db_name, err.message);
+        });
+        const host: string = 'localhost';
+        const port: number = +process.env.PORT;
+        this.express.listen(port, host, () => { console.log(`Listening to ${port} ${host}`) });
+    }
+}
+module.exports = new App().express;
