@@ -32,5 +32,56 @@ const sequelize = new Sequelize({
           useUTC: true,
      }
 });
-   
+const schemaCreate = async function () {
+     // const test = [];
+     var schemas = await sequelize.showAllSchemas({}).then(
+       (s) => {
+         CONSTANT.SCHEMAS.forEach((item) => {
+           if (s.indexOf(item) < 0) {
+             sequelize.createSchema(item,{}).then((res) => { });
+           }
+         });
+       },
+       (err) => {
+         console.log("in err", err);
+       }
+     );
+     return schemas;
+   };
+
+//    CONSTANT.SCHEMAS.forEach((item:string) => {
+//      fs.readdirSync(__dirname + "/" + item)
+//        .filter((file:string) => {
+//          return (
+//            file.indexOf(".") !== 0 &&
+//            file !== basename &&
+//            file.slice(-3) === ".js"
+//          );
+//        })
+//        .forEach((file:string) => {
+//          // console.log(file, "in file val");
+//          // if (file.indexOf('users.js') >= 0) {
+//          var model = require(path.join(__dirname + "/" + item, file)).default;
+//          db[file.slice(0, -3)] = model(sequelize, DataTypes);
+//          // }
+ 
+//          // console.log('in db new', db);
+//        });
+//    });
+CONSTANT.SCHEMAS.forEach(async (item: string) => {
+     const files = await fs.promises.readdir(path.join(__dirname, item));
+     for (const file of files) {
+       if (file.indexOf(".") !== 0 && file.slice(-3) === ".js") {
+         const model = require(path.join(__dirname, item, file)).default;
+         if (model) {
+           db[file.slice(0, -3)] = model(sequelize, DataTypes);
+         }
+       }
+     }
+   });
+   console.log(db,'djkhfjksd')
+
+   schemaCreate();
+
+
 export {sequelize}

@@ -39,7 +39,7 @@ class App {
         });
         const host: string = 'localhost';
         const port: number = +process.env.PORT;
-        this.express.listen(port, host, () => { console.log(`Listening to ${port} ${host}`) });
+        this.express.listen(3000,host, () => { console.log(`Listening to ${port} ${host}`) });
     }
 }
 module.exports = new App().express;
