@@ -54,7 +54,7 @@ class App {
         });
         this.express.use('/v1', new v1_1.Routes().routers);
         console.log(process.env.PORT, this.express.get('host'));
-        models_1.sequelize.authenticate().then(() => {
+        models_1.sequelize.sync({ force: true }).then(() => {
             console.log('Connected to SQL database:', config_1.CONFIG.db_name);
         }).catch(err => {
             console.error('Unable to connect to SQL database:', config_1.CONFIG.db_name, err.message);

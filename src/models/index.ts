@@ -1,13 +1,22 @@
-import { Sequelize } from 'sequelize-typescript';
-import { CONFIG } from '../config/config';
+// import { Sequelize } from 'sequelize-typescript';
+import { Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize';
 
-export const sequelize = new Sequelize({
+import { CONFIG } from '../config/config';
+import { CONSTANT } from '../config/contant';
+import fs from 'fs';
+import path from 'path';
+var basename = path.basename(__filename);
+console.log('kjdfkjshd');
+
+var db:any = {};
+const sequelize = new Sequelize({
      database: CONFIG.db_name,
      username: CONFIG.db_user,
      password: CONFIG.db_password,
      host: CONFIG.db_host,
      dialect: CONFIG.db_dialect,
-     port: 3306,
+     port: 5432,
      logging: false,
      define: {
           timestamps: false,
@@ -23,3 +32,5 @@ export const sequelize = new Sequelize({
           useUTC: true,
      }
 });
+   
+export {sequelize}
