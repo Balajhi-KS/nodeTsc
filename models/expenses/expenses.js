@@ -76,3 +76,46 @@
 //     timestamps: false,
 //   }
 // );
+'use strict';
+// Define a model for role table
+module.exports = (db, Sequelize) => {
+    var Expenses = db.define('expenses', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        spend: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
+        balance: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
+        reason: {
+            type: Sequelize.STRING,
+            allowNull: false
+        },
+        created: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW,
+            allowNull: false
+        },
+        modified: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW,
+            allowNull: false
+        }
+    }, {
+        tableName: 'expenses',
+        schema: "expenses",
+        underscored: true,
+    });
+    // Adding a class level method.
+    Expenses.association = function (models) {
+        Expenses.belongsTo(models.category, { foreignKey: 'categoryId' });
+        Expenses.belongsTo(models.category, { foreignKey: "categoryId" });
+    };
+    return Expenses;
+};

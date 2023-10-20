@@ -72,16 +72,22 @@ CONSTANT.SCHEMAS.forEach(async (item: string) => {
      const files = await fs.promises.readdir(path.join(__dirname, item));
      for (const file of files) {
        if (file.indexOf(".") !== 0 && file.slice(-3) === ".js") {
-         const model = require(path.join(__dirname, item, file)).default;
+         const model = require(path.join(__dirname, item, file));
          if (model) {
            db[file.slice(0, -3)] = model(sequelize, DataTypes);
-         }
+          }
+          console.log(db,model,'djkhfjksd');
        }
      }
    });
-   console.log(db,'djkhfjksd')
-
-   schemaCreate();
-
+   Object.keys(db).forEach((modelName) => {
+    // console.log(modelName, 'in model', db['addresses']);
+    if (db[modelName].association) {
+      db[modelName].association(db);
+    }
+  });
+db.schemaCreate = schemaCreate();
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
 export {sequelize}
