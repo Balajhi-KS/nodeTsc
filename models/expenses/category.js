@@ -2,27 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-    class Expenses extends sequelize_1.Model {
-        // public categoryId!: number;
+    class Category extends sequelize_1.Model {
         static associate(models) {
-            Expenses.belongsTo(models.category, { foreignKey: 'categoryId' });
+            // Category.belongsTo(models.category, { foreignKey: 'categoryId' });
+            Category.hasMany(models.expenses, { foreignKey: 'categoryId' });
         }
     }
-    Expenses.init({
+    Category.init({
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        spend: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        balance: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        reason: {
+        categoryName: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -35,17 +27,13 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             defaultValue: sequelize_1.Sequelize.literal('CURRENT_TIMESTAMP'),
             allowNull: false,
-        },
-        // categoryId: {
-        //   type: DataTypes.INTEGER,
-        //   allowNull: true,
-        // },
+        }
     }, {
         sequelize,
-        modelName: 'Expenses',
+        modelName: 'Category',
         schema: "expenses",
-        tableName: 'expenses',
+        tableName: 'category',
         underscored: true,
     });
-    return Expenses;
+    return Category;
 };

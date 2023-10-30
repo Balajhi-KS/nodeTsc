@@ -7,6 +7,10 @@ import * as dotenv from 'dotenv';
 
 import { sequelize } from './models';
 import { CONFIG } from './config/config';
+import helmet from 'helmet';
+import passport from 'passport';
+import logger from 'morgan';
+
 dotenv.config();
 class App {
     public express: express.Application;
@@ -18,7 +22,9 @@ class App {
         this.express.use(cors());
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: true }));
-
+        this.express.use(helmet());
+        this.express.use(passport.initialize());
+        this.express.use(logger('dev'));
     }
     private mountRoutes(): void {
         this.express.use(function (req: Request, res: Response, next: NextFunction) {
