@@ -25,14 +25,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReE = exports.Reponse = exports.to = exports.TE = void 0;
 const zlib = __importStar(require("zlib"));
-const pe = __importStar(require("parse-error"));
-// export class GlobalFunction {
-//     constructor() {}
+const parse_base_error_1 = require("parse-base-error");
 const to = function (promise) {
     return promise
         .then(data => {
         return [null, data];
-    }).catch(err => [pe(err)]);
+    }).catch(err => 
+    // [pe(err)]
+    (0, parse_base_error_1.parseBaseError)(err));
 };
 exports.to = to;
 const TE = function (err_message, log) {
@@ -73,7 +73,8 @@ const Reponse = function (res, data, code) {
 };
 exports.Reponse = Reponse;
 // }
-//This is here to handle all the uncaught promise rejections
-// process.on('unhandledRejection', error => {
-//         console.error('Uncaught Error', pe(error));
-// });
+// This is here to handle all the uncaught promise rejections
+// console.log('errrr',err);
+process.on('unhandledRejection', error => {
+    console.error('Uncaught Error', (0, parse_base_error_1.parseBaseError)(error));
+});
