@@ -6,7 +6,6 @@ import { CONSTANT } from '../config/contant';
 import { Sequelize, DataTypes } from 'sequelize';
 
 var basename = path.basename(__filename);
-console.log('kjdfkjshd');
 
 const db: { [key: string]: any } = {};
 
@@ -64,30 +63,34 @@ CONSTANT.SCHEMAS.forEach((item) => {
         DataTypes
       );
       db[file.slice(0, -3)] = model;
-      console.log('in db new', db);
+      // console.log('in db new', db);
     });
 });
 
 
    Object.keys(db).forEach((modelName) => {
      if (db[modelName].associate) {
-       console.log(db[modelName], 'in model');
+      //  console.log(db[modelName], 'in model');
       db[modelName].associate(db);
     }
   });
 
   const dbInstance: {
     [key: string]: any;
-    schemaCreate: () => Promise<any>;
+    schemaCreates: () => Promise<any>;
     sequelize: Sequelize;
     Sequelize: typeof Sequelize;
   } = {
     ...db,
-    schemaCreate,
+    schemaCreates: async () => {
+      const result = await schemaCreate();
+      return result;
+    },
     sequelize,
     Sequelize,
   };
-// db.schemaCreate = schemaCreate();
+  // console.log('db',db)
+  dbInstance.schemaCreates();
 // db.sequelize = sequelize;
 // db.Sequelize = Sequelize;
 

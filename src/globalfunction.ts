@@ -1,0 +1,62 @@
+import * as zlib from 'zlib';
+import * as pe from 'parse-error';
+
+// export class GlobalFunction {
+//     constructor() {}
+
+   const to = function (promise) {//global function that will help use handle promise rejections, this article talks about it http://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
+        return promise
+            .then(data => {
+                return [null, data];
+            }).catch(err =>
+                [pe(err)]
+            );
+    }
+   const TE = function (err_message, log) {
+        if (log === true) {
+            console.error(err_message);
+        }
+
+        throw new Error(err_message);
+    }
+
+   const ReE = function (res, err, code) {
+        if (typeof err == 'object' && typeof err.message != 'undefined') {
+            err = err.message;
+        }
+
+        if (typeof code !== 'undefined') res.statusCode = code;
+
+        return res.json({ success: false, error: err });
+    }
+
+   const Reponse = function (res, data, code) {
+        let send_data = { success: true };
+        if (typeof data == 'object') {
+            send_data = Object.assign(data, send_data);//merge the objects
+        }
+        const jsonString = JSON.stringify(send_data);
+
+        zlib.gzip(jsonString, (err, buffer) => {
+            if (err) {
+                res.status(500).json({ error: 'Internal Server Error' });
+                return;
+            }
+
+            if (typeof code !== 'undefined') res.statusCode = code;
+
+            res.set({
+                'Content-Encoding': 'gzip',
+                'Content-Type': 'application/json',
+            });
+
+            res.send(buffer);
+        });
+    };
+
+export { TE, to, Reponse, ReE }
+// }
+//This is here to handle all the uncaught promise rejections
+// process.on('unhandledRejection', error => {
+//         console.error('Uncaught Error', pe(error));
+// });

@@ -19,7 +19,6 @@ const config_1 = require("../config/config");
 const contant_1 = require("../config/contant");
 const sequelize_1 = require("sequelize");
 var basename = path_1.default.basename(__filename);
-console.log('kjdfkjshd');
 const db = {};
 const sequelize = new sequelize_1.Sequelize({
     database: config_1.CONFIG.db_name,
@@ -69,16 +68,20 @@ contant_1.CONSTANT.SCHEMAS.forEach((item) => {
         .forEach((file) => {
         const model = require(path_1.default.join(__dirname, item, file))(sequelize, sequelize_1.DataTypes);
         db[file.slice(0, -3)] = model;
-        console.log('in db new', db);
+        // console.log('in db new', db);
     });
 });
 Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {
-        console.log(db[modelName], 'in model');
+        //  console.log(db[modelName], 'in model');
         db[modelName].associate(db);
     }
 });
-const dbInstance = Object.assign(Object.assign({}, db), { schemaCreate,
-    sequelize,
+const dbInstance = Object.assign(Object.assign({}, db), { schemaCreates: () => __awaiter(void 0, void 0, void 0, function* () {
+        const result = yield schemaCreate();
+        return result;
+    }), sequelize,
     Sequelize: sequelize_1.Sequelize });
 exports.dbInstance = dbInstance;
+// console.log('db',db)
+dbInstance.schemaCreates();

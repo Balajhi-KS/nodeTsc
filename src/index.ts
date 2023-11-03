@@ -1,7 +1,7 @@
 // var express = require('express');
 import express, { Application, Request, Response, NextFunction, Router, Express } from 'express'
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import * as bodyParser from 'body-parser';
 import { Routes } from './routes/v1';
 import * as dotenv from 'dotenv';
 
@@ -48,4 +48,4 @@ class App {
         this.express.listen(3000,host, () => { console.log(`Listening to ${port} ${host}`) });
     }
 }
-module.exports = new App().express;
+export = new App().express;
