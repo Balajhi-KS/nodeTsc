@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 // var express = require('express');
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const bodyParser = __importStar(require("body-parser"));
+const body_parser_1 = __importDefault(require("body-parser"));
 const v1_1 = require("./routes/v1");
 const dotenv = __importStar(require("dotenv"));
 const models_1 = require("./models");
@@ -43,13 +43,13 @@ class App {
         this.express = (0, express_1.default)();
         this.mountRoutes();
         this.express.use((0, cors_1.default)());
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: true }));
         this.express.use((0, helmet_1.default)());
         this.express.use(passport_1.default.initialize());
         this.express.use((0, morgan_1.default)('dev'));
     }
     mountRoutes() {
+        this.express.use(body_parser_1.default.json({ limit: '10mb' }));
+        this.express.use(body_parser_1.default.urlencoded({ extended: true }));
         this.express.use(function (req, res, next) {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

@@ -21,8 +21,9 @@ class Expense {
     constructor() {
         this.createCategorys = (req, res) => __awaiter(this, void 0, void 0, function* () {
             let err, success;
-            if (req && req.query) {
-                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.createCategory(req.query));
+            console.log(req.query, 'expenseSevices', req.body);
+            if (req && req.body) {
+                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.createCategory(req.body));
             }
             if (err)
                 return (0, globalfunction_1.ReE)(res, err, 422);
@@ -31,7 +32,6 @@ class Expense {
         this.express = (0, express_1.default)();
         this.router = express_1.default.Router();
         this.expenseSevices = new expense_service_1.ExpenseSevices();
-        console.log(this.expenseSevices, 'expenseSevices');
     }
     get routes() {
         this.router.post('/add', this.createCategorys);

@@ -7,8 +7,8 @@ import { parseBaseError } from 'parse-base-error';
             .then(data => {
                 return [null, data];
             }).catch(err =>
-                // [pe(err)]
-                parseBaseError(err)
+                // parseBaseError(err)
+                console.log(err)
             );
     }
    const TE = function (err_message, log) {
@@ -54,10 +54,8 @@ import { parseBaseError } from 'parse-base-error';
     };
 
 export { TE, to, Reponse, ReE }
-// }
-// This is here to handle all the uncaught promise rejections
-// console.log('errrr',err);
+
 process.on('unhandledRejection', error => {
     
-        console.error('Uncaught Error', parseBaseError(error));
+        console.error('Uncaught Error', error);
 });

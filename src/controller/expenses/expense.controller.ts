@@ -12,13 +12,12 @@ export class Expense {
           this.express = express();
           this.router = express.Router();
           this.expenseSevices = new ExpenseSevices(); 
-          console.log(this.expenseSevices,'expenseSevices');
      }
      createCategorys= async (req: Request, res: Response) =>{
           let err, success;
-
-          if (req && req.query) {
-              [err, success] = await to(this.expenseSevices.createCategory(req.query));
+          
+          if (req && req.body) {
+              [err, success] = await to(this.expenseSevices.createCategory(req.body));
           }
           if (err) return ReE(res, err, 422);
           return Reponse(res, {success:"success"}, 200);

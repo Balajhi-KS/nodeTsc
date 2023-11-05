@@ -1,7 +1,7 @@
 // var express = require('express');
 import express, { Application, Request, Response, NextFunction, Router, Express } from 'express'
 import cors from 'cors';
-import * as bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 import { Routes } from './routes/v1';
 import * as dotenv from 'dotenv';
 
@@ -20,13 +20,13 @@ class App {
         this.express = express();
         this.mountRoutes();
         this.express.use(cors());
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: true }));
         this.express.use(helmet());
         this.express.use(passport.initialize());
-        this.express.use(logger('dev'));
     }
     private mountRoutes(): void {
+        this.express.use(logger('dev'));
+        this.express.use(bodyParser.json({ limit: '10mb' }));
+        this.express.use(bodyParser.urlencoded({ extended: true }));
         this.express.use(function (req: Request, res: Response, next: NextFunction) {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
