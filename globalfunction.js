@@ -30,8 +30,10 @@ const to = function (promise) {
         .then(data => {
         return [null, data];
     }).catch(err => 
+    // [pe(err)]
+    console.log(err)
     // parseBaseError(err)
-    console.log(err));
+    );
 };
 exports.to = to;
 const TE = function (err_message, log) {
@@ -72,5 +74,6 @@ const Reponse = function (res, data, code) {
 };
 exports.Reponse = Reponse;
 process.on('unhandledRejection', error => {
-    console.error('Uncaught Error', error);
+    // console.error('Uncaught Error', parseBaseError(error));
+    console.error('Uncaught Error');
 });

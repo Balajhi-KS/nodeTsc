@@ -1,5 +1,4 @@
 import * as zlib from 'zlib';
-import { parseBaseError } from 'parse-base-error';
 
 
    const to = function (promise:any) {//global function that will help use handle promise rejections, this article talks about it http://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
@@ -7,8 +6,9 @@ import { parseBaseError } from 'parse-base-error';
             .then(data => {
                 return [null, data];
             }).catch(err =>
-                // parseBaseError(err)
+                // [pe(err)]
                 console.log(err)
+                // parseBaseError(err)
             );
     }
    const TE = function (err_message, log) {
@@ -56,6 +56,6 @@ import { parseBaseError } from 'parse-base-error';
 export { TE, to, Reponse, ReE }
 
 process.on('unhandledRejection', error => {
-    
-        console.error('Uncaught Error', error);
+        // console.error('Uncaught Error', parseBaseError(error));
+        console.error('Uncaught Error');
 });

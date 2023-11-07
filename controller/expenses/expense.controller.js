@@ -21,7 +21,6 @@ class Expense {
     constructor() {
         this.createCategorys = (req, res) => __awaiter(this, void 0, void 0, function* () {
             let err, success;
-            console.log(req.query, 'expenseSevices', req.body);
             if (req && req.body) {
                 [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.createCategory(req.body));
             }

@@ -16,9 +16,12 @@ export class ExpenseSevices{
           // console.log('dkjfhsk',dbInstance);
           
           let createCategoryErr, createCategorySuccess;
-               console.log(data,'jdfkjshdkjfhs');
+               console.log(data,'jdfkjshdkjfhs',this.categoryModel);
           [createCategoryErr, createCategorySuccess] = await to(this.categoryModel.create(data));
-          if (createCategoryErr) return TE(createCategoryErr.message,true);
+          if (createCategoryErr) {
+              console.log('createCategoryErr',createCategoryErr) 
+               return TE(createCategoryErr.message,true);
+          }
           return createCategorySuccess;
           // return '';
      }

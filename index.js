@@ -45,9 +45,9 @@ class App {
         this.express.use((0, cors_1.default)());
         this.express.use((0, helmet_1.default)());
         this.express.use(passport_1.default.initialize());
-        this.express.use((0, morgan_1.default)('dev'));
     }
     mountRoutes() {
+        this.express.use((0, morgan_1.default)('dev'));
         this.express.use(body_parser_1.default.json({ limit: '10mb' }));
         this.express.use(body_parser_1.default.urlencoded({ extended: true }));
         this.express.use(function (req, res, next) {
@@ -59,7 +59,7 @@ class App {
         });
         this.express.use('/v1', new v1_1.Routes().routers);
         console.log(process.env.PORT, this.express.get('host'));
-        models_1.sequelize.sync({ force: true }).then(() => {
+        models_1.sequelize.sync().then(() => {
             console.log('Connected to SQL database:', config_1.CONFIG.db_name);
         }).catch(err => {
             console.error('Unable to connect to SQL database:', config_1.CONFIG.db_name, err.message);

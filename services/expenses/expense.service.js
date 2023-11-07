@@ -24,10 +24,12 @@ class ExpenseSevices {
         this.createCategory = (data) => __awaiter(this, void 0, void 0, function* () {
             // console.log('dkjfhsk',dbInstance);
             let createCategoryErr, createCategorySuccess;
-            console.log(data, 'jdfkjshdkjfhs');
+            console.log(data, 'jdfkjshdkjfhs', this.categoryModel);
             [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.categoryModel.create(data));
-            if (createCategoryErr)
+            if (createCategoryErr) {
+                console.log('createCategoryErr', createCategoryErr);
                 return (0, globalfunction_1.TE)(createCategoryErr.message, true);
+            }
             return createCategorySuccess;
             // return '';
         });
