@@ -55,7 +55,9 @@ import * as zlib from 'zlib';
 
 export { TE, to, Reponse, ReE }
 
-process.on('unhandledRejection', error => {
-        // console.error('Uncaught Error', parseBaseError(error));
-        console.error('Uncaught Error');
+process.on('unhandledRejection', (reason: string, p: Promise<any>) => {
+    console.error('Unhandled Rejection at:', p, 'reason:', reason);
+});
+process.on('uncaughtException', (error: Error) => {
+    console.error(`Caught exception: ${error}\n` + `Exception origin: ${error.stack}`);
 });

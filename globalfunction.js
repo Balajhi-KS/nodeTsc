@@ -73,7 +73,9 @@ const Reponse = function (res, data, code) {
     });
 };
 exports.Reponse = Reponse;
-process.on('unhandledRejection', error => {
-    // console.error('Uncaught Error', parseBaseError(error));
-    console.error('Uncaught Error');
+process.on('unhandledRejection', (reason, p) => {
+    console.error('Unhandled Rejection at:', p, 'reason:', reason);
+});
+process.on('uncaughtException', (error) => {
+    console.error(`Caught exception: ${error}\n` + `Exception origin: ${error.stack}`);
 });
