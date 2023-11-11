@@ -8,7 +8,7 @@ import * as dotenv from 'dotenv';
 import { sequelize } from './models';
 import { CONFIG } from './config/config';
 import helmet from 'helmet';
-import passport from 'passport';
+import {passport} from './middleware/passport';
 import logger from 'morgan';
 
 dotenv.config();
@@ -18,12 +18,13 @@ class App {
     // public routes: Routes;
     constructor() {
         this.express = express();
-        this.mountRoutes();
         this.express.use(cors());
         this.express.use(helmet());
-        this.express.use(passport.initialize());
+        this.mountRoutes();
     }
     private mountRoutes(): void {
+        this.express.use(passport.initialize());
+        // this.express.use(passport.session());
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json({ limit: '10mb' }));
         this.express.use(bodyParser.urlencoded({ extended: true }));

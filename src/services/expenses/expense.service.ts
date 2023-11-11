@@ -13,17 +13,13 @@ export class ExpenseSevices{
 
      // }
      createCategory = async (data) => {
-          // console.log('dkjfhsk',dbInstance);
-          
           let createCategoryErr, createCategorySuccess;
-               console.log(data,'jdfkjshdkjfhs',this.categoryModel);
           [createCategoryErr, createCategorySuccess] = await to(this.categoryModel.create(data));
           if (createCategoryErr) {
               console.log('createCategoryErr',createCategoryErr) 
                return TE(createCategoryErr.message,true);
           }
           return createCategorySuccess;
-          // return '';
      }
      // createExpense = async function (data) {
      //      let createCategoryErr, createCategorySuccess;

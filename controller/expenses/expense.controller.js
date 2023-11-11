@@ -33,6 +33,7 @@ class Expense {
         this.expenseSevices = new expense_service_1.ExpenseSevices();
     }
     get routes() {
+        // passport.authenticate('jwt', { session: false }),
         this.router.post('/add', this.createCategorys);
         return this.router;
     }

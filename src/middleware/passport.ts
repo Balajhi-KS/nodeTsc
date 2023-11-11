@@ -1,4 +1,5 @@
 import { Strategy, ExtractJwt } from 'passport-jwt';
+import passport from 'passport';
 
 const JwtStrategy = Strategy;
 
@@ -8,10 +9,11 @@ const jwtOptions = {
   };
   
   // Usage example for the JwtStrategy
-  const jwtStrategy = new JwtStrategy(jwtOptions, (jwtPayload, done) => {
-    // You can implement your JWT authentication logic here
-    // jwtPayload contains the decoded JWT payload
-    // Call done(err, user) to indicate success or failure
-    // e.g., if user is authenticated, call done(null, user);
-  });
-  export { jwtStrategy, jwtOptions };
+  passport.use( new JwtStrategy(jwtOptions,async (jwtPayload, done) =>{
+    if(jwtPayload){
+      return done(null,jwtPayload);
+    }else{
+      return done(null, false);
+    }
+  }));
+  export { passport };

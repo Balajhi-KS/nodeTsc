@@ -3,7 +3,7 @@ import expressAsyncHandler from 'express-async-handler'
 import {ExpenseSevices}  from '../../services/expenses/expense.service';
 // import { GlobalFunction } from '../../globalfunction';
 import {TE, to, Reponse, ReE } from '../../globalfunction';
-
+import passport from 'passport';
 export class Expense {
      public express: express.Application;
      public router: express.Router;
@@ -24,7 +24,8 @@ export class Expense {
      }
 
      get routes() {
-          this.router.post('/add', this.createCategorys);
+          // passport.authenticate('jwt', { session: false }),
+          this.router.post('/add',  this.createCategorys);
           return this.router;
      }
 };

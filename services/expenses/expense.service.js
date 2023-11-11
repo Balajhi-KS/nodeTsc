@@ -22,16 +22,13 @@ class ExpenseSevices {
         // constructor(){
         // }
         this.createCategory = (data) => __awaiter(this, void 0, void 0, function* () {
-            // console.log('dkjfhsk',dbInstance);
             let createCategoryErr, createCategorySuccess;
-            console.log(data, 'jdfkjshdkjfhs', this.categoryModel);
             [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.categoryModel.create(data));
             if (createCategoryErr) {
                 console.log('createCategoryErr', createCategoryErr);
                 return (0, globalfunction_1.TE)(createCategoryErr.message, true);
             }
             return createCategorySuccess;
-            // return '';
         });
         // createExpense = async function (data) {
         //      let createCategoryErr, createCategorySuccess;
