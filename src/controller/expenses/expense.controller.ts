@@ -6,6 +6,7 @@ import { TE, to, Reponse, ReE } from '../../globalfunction';
 import passport from 'passport';
 import { createExpense } from './expense.interface';
 import { expenseValidator } from '../../validator/experess.validator';
+import { validate } from '../../middleware/validate-schema';
 export class Expense {
      public express: express.Application;
      public router: express.Router;
@@ -52,7 +53,7 @@ export class Expense {
 
      get routes() {
           // passport.authenticate('jwt', { session: false }),
-          this.router.post('/category', expenseValidator.createCategory ,this.createCategorys);
+          this.router.post('/category', expenseValidator.createCategory,validate ,this.createCategorys);
           this.router.get('/category', this.getAllCategory);
           this.router.post('/daily/expenses', this.createDailyExpenses);
           return this.router;
