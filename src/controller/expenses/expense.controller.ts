@@ -26,11 +26,9 @@ export class Expense {
 
      getAllCategory = async (req: Request, res: Response) => {
           let err, success;
-
           if (req ) {
                [err, success] = await to(this.expenseSevices.getAllCategory());
           }
-          console.log(success,'sjhdkjfa/........')
           if (err) return ReE(res, err, 422);
           return Reponse(res, success , 200);
      }

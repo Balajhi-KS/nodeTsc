@@ -33,7 +33,6 @@ class Expense {
             if (req) {
                 [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.getAllCategory());
             }
-            console.log(success, 'sjhdkjfa/........');
             if (err)
                 return (0, globalfunction_1.ReE)(res, err, 422);
             return (0, globalfunction_1.Reponse)(res, success, 200);
