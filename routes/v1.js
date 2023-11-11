@@ -14,7 +14,7 @@ class Routes {
     }
     get routers() {
         // this.router.get('/user', this.controller.createCategorys);
-        this.router.use('/user', this.controller.routes);
+        this.router.use('/expense', this.controller.routes);
         return this.router;
     }
 }

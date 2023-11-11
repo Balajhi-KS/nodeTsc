@@ -28,13 +28,40 @@ class Expense {
                 return (0, globalfunction_1.ReE)(res, err, 422);
             return (0, globalfunction_1.Reponse)(res, { success: "success" }, 200);
         });
+        this.getAllCategory = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let err, success;
+            if (req) {
+                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.getAllCategory());
+            }
+            console.log(success, 'sjhdkjfa/........');
+            if (err)
+                return (0, globalfunction_1.ReE)(res, err, 422);
+            return (0, globalfunction_1.Reponse)(res, success, 200);
+        });
+        this.createDailyExpenses = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let err, success, body;
+            if (req && req.body) {
+                body = req.body;
+                let data = {
+                    spend: body === null || body === void 0 ? void 0 : body.Spend,
+                    balance: body === null || body === void 0 ? void 0 : body.Balance,
+                    reason: body === null || body === void 0 ? void 0 : body.Reason
+                };
+                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.createDailyExpenses(data));
+            }
+            if (err)
+                return (0, globalfunction_1.ReE)(res, err, 422);
+            return (0, globalfunction_1.Reponse)(res, { success: "Daily Expenses created successfully" }, 200);
+        });
         this.express = (0, express_1.default)();
         this.router = express_1.default.Router();
         this.expenseSevices = new expense_service_1.ExpenseSevices();
     }
     get routes() {
         // passport.authenticate('jwt', { session: false }),
-        this.router.post('/add', this.createCategorys);
+        this.router.post('/category', this.createCategorys);
+        this.router.get('/category', this.getAllCategory);
+        this.router.post('/daily/expenses', this.createDailyExpenses);
         return this.router;
     }
 }

@@ -30,7 +30,7 @@ import * as zlib from 'zlib';
     }
 
    const Reponse = function (res, data, code) {
-        let send_data = { success: true };
+        let send_data = { reponse: data };
         if (typeof data == 'object') {
             send_data = Object.assign(data, send_data);//merge the objects
         }

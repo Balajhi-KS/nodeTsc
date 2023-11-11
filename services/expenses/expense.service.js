@@ -19,11 +19,32 @@ const models_1 = require("../../models"); // Update the path to the correct loca
 class ExpenseSevices {
     constructor() {
         this.categoryModel = models_1.dbInstance.category;
+        this.expensesModel = models_1.dbInstance.expenses;
         // constructor(){
         // }
         this.createCategory = (data) => __awaiter(this, void 0, void 0, function* () {
             let createCategoryErr, createCategorySuccess;
             [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.categoryModel.create(data));
+            if (createCategoryErr) {
+                console.log('createCategoryErr', createCategoryErr);
+                return (0, globalfunction_1.TE)(createCategoryErr.message, true);
+            }
+            return createCategorySuccess;
+        });
+        this.getAllCategory = () => __awaiter(this, void 0, void 0, function* () {
+            let createCategoryErr, createCategorySuccess;
+            [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.categoryModel.findAll({
+                attributes: ['id', 'categoryName', 'categoryImage']
+            }));
+            if (createCategoryErr) {
+                console.log('createCategoryErr', createCategoryErr);
+                return (0, globalfunction_1.TE)(createCategoryErr.message, true);
+            }
+            return createCategorySuccess;
+        });
+        this.createDailyExpenses = (data) => __awaiter(this, void 0, void 0, function* () {
+            let createCategoryErr, createCategorySuccess;
+            [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.expensesModel.create(data));
             if (createCategoryErr) {
                 console.log('createCategoryErr', createCategoryErr);
                 return (0, globalfunction_1.TE)(createCategoryErr.message, true);

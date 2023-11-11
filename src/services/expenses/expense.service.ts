@@ -1,13 +1,14 @@
 // import { GlobalFunction } from "../../globalfunction";
-import {TE, to, Reponse, ReE } from '../../globalfunction';
+import { TE, to, Reponse, ReE } from '../../globalfunction';
 import { dbInstance } from '../../models'; // Update the path to the correct location
 // import { Expenses } from '../../models/expenses'; // Update the path to the correct location
 // const { Category } = require('./models');
 // import { Category } from '../../models' as any;
 
 
-export class ExpenseSevices{
-     categoryModel:any = dbInstance.category;
+export class ExpenseSevices {
+     categoryModel: any = dbInstance.category;
+     expensesModel: any = dbInstance.expenses;
 
      // constructor(){
 
@@ -16,8 +17,30 @@ export class ExpenseSevices{
           let createCategoryErr, createCategorySuccess;
           [createCategoryErr, createCategorySuccess] = await to(this.categoryModel.create(data));
           if (createCategoryErr) {
-              console.log('createCategoryErr',createCategoryErr) 
-               return TE(createCategoryErr.message,true);
+               console.log('createCategoryErr', createCategoryErr)
+               return TE(createCategoryErr.message, true);
+          }
+          return createCategorySuccess;
+     }
+
+     getAllCategory = async () => {
+          let createCategoryErr, createCategorySuccess;
+          [createCategoryErr, createCategorySuccess] = await to(this.categoryModel.findAll({
+               attributes: ['id', 'categoryName', 'categoryImage']
+          }));
+          if (createCategoryErr) {
+               console.log('createCategoryErr', createCategoryErr)
+               return TE(createCategoryErr.message, true);
+          }
+          return createCategorySuccess;
+     }
+
+     createDailyExpenses = async (data) => {
+          let createCategoryErr, createCategorySuccess;
+          [createCategoryErr, createCategorySuccess] = await to(this.expensesModel.create(data));
+          if (createCategoryErr) {
+               console.log('createCategoryErr', createCategoryErr)
+               return TE(createCategoryErr.message, true);
           }
           return createCategorySuccess;
      }
