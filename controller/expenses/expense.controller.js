@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const expense_service_1 = require("../../services/expenses/expense.service");
 // import { GlobalFunction } from '../../globalfunction';
 const globalfunction_1 = require("../../globalfunction");
+const experess_validator_1 = require("../../validator/experess.validator");
 class Expense {
     constructor() {
         this.createCategorys = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -58,7 +59,7 @@ class Expense {
     }
     get routes() {
         // passport.authenticate('jwt', { session: false }),
-        this.router.post('/category', this.createCategorys);
+        this.router.post('/category', experess_validator_1.expenseValidator.createCategory, this.createCategorys);
         this.router.get('/category', this.getAllCategory);
         this.router.post('/daily/expenses', this.createDailyExpenses);
         return this.router;
