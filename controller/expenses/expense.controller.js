@@ -37,7 +37,7 @@ class Expense {
             }
             if (err)
                 return (0, globalfunction_1.ReE)(res, err, 422);
-            return (0, globalfunction_1.Reponse)(res, success, 200);
+            return (0, globalfunction_1.Reponse)(res, { success: success }, 200);
         });
         this.createDailyExpenses = (req, res) => __awaiter(this, void 0, void 0, function* () {
             let err, success, body;

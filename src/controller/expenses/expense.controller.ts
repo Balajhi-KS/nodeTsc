@@ -18,7 +18,6 @@ export class Expense {
      }
      createCategorys = async (req: Request, res: Response) => {
           let err, success;
-
           if (req && req.body) {
                [err, success] = await to(this.expenseSevices.createCategory(req.body));
           }
@@ -32,7 +31,7 @@ export class Expense {
                [err, success] = await to(this.expenseSevices.getAllCategory());
           }
           if (err) return ReE(res, err, 422);
-          return Reponse(res, success , 200);
+          return Reponse(res, { success: success }, 200);
      }
 
      createDailyExpenses = async (req: Request, res: Response) => {

@@ -53,7 +53,7 @@ const ReE = function (res, err, code) {
 };
 exports.ReE = ReE;
 const Reponse = function (res, data, code) {
-    let send_data = { reponse: data };
+    let send_data = data;
     if (typeof data == 'object') {
         send_data = Object.assign(data, send_data); //merge the objects
     }
