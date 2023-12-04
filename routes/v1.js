@@ -6,15 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Routes = void 0;
 const express_1 = __importDefault(require("express"));
 const expense_controller_1 = require("../controller/expenses/expense.controller");
+const user_controller_1 = require("../controller/user/user.controller");
 class Routes {
     constructor() {
         this.express = (0, express_1.default)();
         this.router = express_1.default.Router();
-        this.controller = new expense_controller_1.Expense();
+        this.expenseController = new expense_controller_1.Expense();
+        this.userController = new user_controller_1.User();
     }
     get routers() {
-        // this.router.get('/user', this.controller.createCategorys);
-        this.router.use('/expense', this.controller.routes);
+        // this.router.get('/user', this.expenseController.createCategorys);
+        this.router.use('/expense', this.expenseController.routes);
+        this.router.use('/user', this.userController.routes);
         return this.router;
     }
 }

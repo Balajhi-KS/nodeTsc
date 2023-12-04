@@ -2,7 +2,7 @@
 
 let CONSTANT: any = {};
 CONSTANT.SCHEMAS = [
-     // 'User',
+     'User',
      'expenses'
 ];
 

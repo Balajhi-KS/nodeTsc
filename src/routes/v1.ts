@@ -1,20 +1,25 @@
 
 import express, { Application, Request, Response, NextFunction, Router } from 'express';
 import { Expense } from '../controller/expenses/expense.controller';
+import { User } from '../controller/user/user.controller';
 
 export class Routes {
      public express: express.Application;
      public router: express.Router;
-     controller: Expense;
+     expenseController: Expense;
+     userController: User;
 
      constructor() {
           this.express = express();
           this.router = express.Router();
-          this.controller = new Expense();
+          this.expenseController = new Expense();
+          this.userController = new User();
      }
      get routers() {
-          // this.router.get('/user', this.controller.createCategorys);
-          this.router.use('/expense', this.controller.routes);
+          // this.router.get('/user', this.expenseController.createCategorys);
+          this.router.use('/expense', this.expenseController.routes);
+          this.router.use('/user', this.userController.routes);
+
           return this.router;
      }
 

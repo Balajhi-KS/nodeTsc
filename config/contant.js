@@ -5,6 +5,6 @@ exports.CONSTANT = void 0;
 let CONSTANT = {};
 exports.CONSTANT = CONSTANT;
 CONSTANT.SCHEMAS = [
-    // 'User',
+    'User',
     'expenses'
 ];
