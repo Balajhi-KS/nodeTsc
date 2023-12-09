@@ -13,8 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
-const globalfunction_1 = require("../../globalfunction");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const crypto_1 = __importDefault(require("crypto"));
 module.exports = (sequelize, DataTypes) => {
     class User extends sequelize_1.Model {
         static associate(models) {
@@ -30,9 +29,17 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true,
         },
-        user_id: {
+        firstName: {
             type: DataTypes.STRING,
-            //  allowNull: false,
+            allowNull: false,
+        },
+        lastName: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        userId: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         email: {
             type: DataTypes.STRING,
@@ -64,19 +71,12 @@ module.exports = (sequelize, DataTypes) => {
         underscored: true,
     });
     User.beforeSave((user, options) => __awaiter(void 0, void 0, void 0, function* () {
-        let err;
         if (user.changed('password')) {
             let salt, hash;
-            let rounds = Math.floor(Math.random() * 6 + 4);
-            [err, salt] = yield (0, globalfunction_1.to)(bcrypt_1.default.genSalt(rounds));
-            if (err) {
-                console.log(err.message);
-            }
-            [err, hash] = yield (0, globalfunction_1.to)(bcrypt_1.default.hash(user.password, salt));
-            if (err) {
-                console.log(err.message);
-            }
-            user.password = hash;
+            salt = crypto_1.default.randomBytes(8).toString('hex');
+            hash = crypto_1.default.createHash('sha256');
+            hash.update(user.password + salt);
+            user.password = salt + hash.digest('hex');
         }
     }));
     return User;

@@ -17,12 +17,20 @@ const express_1 = __importDefault(require("express"));
 const user_service_1 = require("../../services/user/user.service");
 const globalfunction_1 = require("../../globalfunction");
 class User {
+    /**
+     * Init declaration
+     */
     constructor() {
+        /**
+         * Register new user
+         * @param req body data
+         * @param res success message
+         * @returns success message
+         */
         this.registerUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            let err, success, body;
+            let err, success;
             if (req && req.body) {
-                body = req.body;
-                [err, success] = yield (0, globalfunction_1.to)(this.UserSevices.registerUser(body));
+                [err, success] = yield (0, globalfunction_1.to)(this.UserSevices.registerUser(req.body));
             }
             if (err)
                 return (0, globalfunction_1.ReE)(res, err, 422);
@@ -32,6 +40,9 @@ class User {
         this.router = express_1.default.Router();
         this.UserSevices = new user_service_1.UserSevices();
     }
+    /**
+     * Access router
+     */
     get routes() {
         this.router.post('/register', this.registerUser);
         return this.router;

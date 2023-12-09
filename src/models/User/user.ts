@@ -1,12 +1,13 @@
 'use strict';
 
 import { Model, DataTypes, Sequelize } from 'sequelize';
-import { to } from '../../globalfunction';
-import  bcrypt  from 'bcrypt';
+import crypto from 'crypto';
 
 interface UserAttributes {
   id: number;
-  user_id: string;
+  firstName: string;
+  lastName: string;
+  userId: string;
   email: string;
   phone: number;
   password: string;
@@ -17,7 +18,9 @@ interface UserAttributes {
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
   class User extends Model<UserAttributes> implements UserAttributes {
     public id!: number;
-    public user_id!: string;
+    public firstName!: string;
+    public lastName!: string;
+    public userId!: string;
     public email!: string;
     public phone!: number;
     public password!: string;
@@ -38,9 +41,17 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    user_id:{
+    firstName:{
      type: DataTypes.STRING,
-    //  allowNull: false,
+     allowNull: false,
+    },
+    lastName:{
+     type: DataTypes.STRING,
+     allowNull: false,
+    },
+    userId:{
+     type: DataTypes.STRING,
+     allowNull: false,
     },
     email: {
       type: DataTypes.STRING,
@@ -73,19 +84,12 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
   });
 
   User.beforeSave(async (user, options) => {
-    let err;
     if (user.changed('password')) {
-      let salt, hash;
-      let rounds = Math.floor(Math.random() * 6 + 4);
-      [err, salt] = await to(bcrypt.genSalt(rounds));
-      if (err) {
-        console.log(err.message);
-      }
-      [err, hash] = await to(bcrypt.hash(user.password, salt));
-      if (err) {
-        console.log(err.message);
-      }
-      user.password = hash;
+      let salt: string, hash: any;
+      salt = crypto.randomBytes(8).toString('hex');
+      hash = crypto.createHash('sha256');
+      hash.update(user.password + salt);
+      user.password = salt + hash.digest('hex');
     }
   });
     

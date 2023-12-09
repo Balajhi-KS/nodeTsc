@@ -15,10 +15,55 @@ const models_1 = require("../../models");
 class UserSevices {
     constructor() {
         this.userModel = models_1.dbInstance.user;
+        /**
+         * Create New user
+         * @param body
+         * @returns
+         */
         this.registerUser = (body) => __awaiter(this, void 0, void 0, function* () {
-            console.log(body, 'daaaaaaaa');
-            let [userErr, user] = yield (0, globalfunction_1.to)(this.userModel.create(body));
+            let createRandomErr, createRandomId, userErr, user;
+            [createRandomErr, createRandomId] = yield (0, globalfunction_1.to)(this.createRandomUserId({ firstName: body.firstName, lastName: body.lastName }));
+            let data = {
+                firstName: body.firstName,
+                lastName: body.lastName,
+                userId: createRandomId,
+                email: body.email,
+                phone: body.phone,
+                password: body.password
+            };
+            [userErr, user] = yield (0, globalfunction_1.to)(this.userModel.create(data));
+            if (userErr)
+                return userErr;
             return user;
+        });
+        /**
+         * Create Random user id
+         * @param req
+         * @param res
+         */
+        this.createRandomUserId = (name) => __awaiter(this, void 0, void 0, function* () {
+            let randomUserId;
+            let checkUserIdAleadyExistErr, checkUserIdAleadyExist;
+            let i;
+            while (i != 0) {
+                randomUserId = (name.firstName + name.lastName + '_' + Math.floor(Math.random() * 10000)).toLocaleLowerCase();
+                [checkUserIdAleadyExistErr, checkUserIdAleadyExist] = yield (0, globalfunction_1.to)(this.checkAleadyExist(randomUserId));
+                if (checkUserIdAleadyExistErr) {
+                    return checkUserIdAleadyExistErr;
+                }
+                if (checkUserIdAleadyExist == null) {
+                    break;
+                }
+            }
+            console.log('im done');
+            return randomUserId;
+        });
+        this.checkAleadyExist = (userId) => __awaiter(this, void 0, void 0, function* () {
+            let checkUserIdAleadyExistErr, checkUserIdAleadyExist;
+            [checkUserIdAleadyExistErr, checkUserIdAleadyExist] = yield (0, globalfunction_1.to)(this.userModel.findOne({ where: { userId: userId } }));
+            if (checkUserIdAleadyExistErr)
+                return checkUserIdAleadyExistErr;
+            return checkUserIdAleadyExist;
         });
     }
 }
