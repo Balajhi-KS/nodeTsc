@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSevices = void 0;
 const globalfunction_1 = require("../../globalfunction");
 const models_1 = require("../../models");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UserSevices {
     constructor() {
         this.userModel = models_1.dbInstance.user;
@@ -55,7 +59,6 @@ class UserSevices {
                     break;
                 }
             }
-            console.log('im done');
             return randomUserId;
         });
         this.checkAleadyExist = (userId) => __awaiter(this, void 0, void 0, function* () {
@@ -64,6 +67,15 @@ class UserSevices {
             if (checkUserIdAleadyExistErr)
                 return checkUserIdAleadyExistErr;
             return checkUserIdAleadyExist;
+        });
+        this.loginUser = (body) => __awaiter(this, void 0, void 0, function* () {
+            const authenticatedUser = yield this.userModel.authenticate(body.userName, body.password);
+            if (authenticatedUser) {
+                let expiration_time = parseInt('15000');
+                let jwtToken = jsonwebtoken_1.default.sign(authenticatedUser, 'key', { expiresIn: expiration_time });
+                return jwtToken;
+            }
+            return null;
         });
     }
 }

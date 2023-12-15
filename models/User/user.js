@@ -23,6 +23,27 @@ module.exports = (sequelize, DataTypes) => {
             //    User.hasMany(models.UserPlaningAmount,{foreignKey:'UserId'});
         }
     }
+    User.authenticate = function (email, password) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield this.findOne({
+                where: { email },
+                attributes: ['id', 'firstName', 'lastName', 'userId', 'email', 'phone', 'password']
+            });
+            this.checkPassword = (_a = user === null || user === void 0 ? void 0 : user.dataValues) === null || _a === void 0 ? void 0 : _a.password;
+            this.salt = this.checkPassword.slice(0, 16);
+            if (user && this.checkPassword && this.salt) {
+                let hash;
+                hash = crypto_1.default.createHash('sha256');
+                hash.update(password + this.salt);
+                if (this.checkPassword === (this.salt + hash.digest('hex'))) {
+                    (_b = user === null || user === void 0 ? void 0 : user.dataValues) === null || _b === void 0 ? true : delete _b.password;
+                    return user === null || user === void 0 ? void 0 : user.dataValues;
+                }
+            }
+            return null;
+        });
+    };
     User.init({
         id: {
             type: DataTypes.INTEGER,

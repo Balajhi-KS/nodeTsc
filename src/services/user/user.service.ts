@@ -1,6 +1,7 @@
 import { to } from '../../globalfunction';
 import { dbInstance } from '../../models';
 import { CheckUserIdAlreadyExist, name, user } from './user.interface';
+import jwt from 'jsonwebtoken';
 export class UserSevices {
      userModel: any = dbInstance.user;
 
@@ -44,7 +45,6 @@ export class UserSevices {
                     break;
                }
           }
-          console.log('im done');
           return randomUserId;
      }
 
@@ -54,4 +54,15 @@ export class UserSevices {
           if (checkUserIdAleadyExistErr) return checkUserIdAleadyExistErr;
           return checkUserIdAleadyExist;
      }
+
+     loginUser = async (body) => {
+          const authenticatedUser = await this.userModel.authenticate(body.userName, body.password);
+          if (authenticatedUser) {
+               let expiration_time = parseInt('15000');
+               let jwtToken = jwt.sign(authenticatedUser, 'key', { expiresIn: expiration_time });
+               return jwtToken;
+          }
+          return null;
+     }
+
 }

@@ -27,12 +27,33 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public created!: Date;
     public modified!: Date;
 
+    public username!: string;
+    public checkPassword!: string;
+    public salt!: string;
     static associate(models: any) {
-      console.log(models,'modelllllll')
+      console.log(models,'modelllllll');
         // User.belongsTo(models.User, { foreignKey: 'UserId' });
      //    User.hasMany(models.expenses,{foreignKey:'UserId'});
      //    User.hasMany(models.UserPlaningAmount,{foreignKey:'UserId'});
     }
+    static authenticate = async function (email: string, password: string): Promise<User | null> {
+      const user = await this.findOne({ 
+        where: { email },
+        attributes:['id','firstName','lastName','userId','email','phone','password'] 
+      });
+      this.checkPassword = user?.dataValues?.password;
+      this.salt = this.checkPassword.slice(0, 16);
+      if (user && this.checkPassword && this.salt) {
+        let hash: any;
+        hash = crypto.createHash('sha256');
+        hash.update(password + this.salt);
+        if(this.checkPassword === (this.salt + hash.digest('hex'))){
+          delete user?.dataValues?.password;
+          return user?.dataValues;
+        } 
+      }
+      return null;
+    };
   }
   
   User.init({
@@ -92,6 +113,6 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       user.password = salt + hash.digest('hex');
     }
   });
-    
+
   return User;
 };

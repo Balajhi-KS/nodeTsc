@@ -29,11 +29,10 @@ const to = function (promise) {
     return promise
         .then(data => {
         return [null, data];
-    }).catch(err => 
-    // [pe(err)]
-    console.log(err)
-    // parseBaseError(err)
-    );
+    }).catch(err => {
+        console.log(err);
+        return [err, null];
+    });
 };
 exports.to = to;
 const TE = function (err_message, log) {

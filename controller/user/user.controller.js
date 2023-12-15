@@ -33,8 +33,27 @@ class User {
                 [err, success] = yield (0, globalfunction_1.to)(this.UserSevices.registerUser(req.body));
             }
             if (err)
-                return (0, globalfunction_1.ReE)(res, err, 422);
+                return (0, globalfunction_1.ReE)(res, { message: 'Unable to Register User' }, 422);
             return (0, globalfunction_1.Reponse)(res, { success: "User Created successfully" }, 200);
+        });
+        /**
+         * Register new user
+         * @param req body data
+         * @param res success message
+         * @returns success message
+         */
+        this.loginUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let err, success;
+            if (req && req.body) {
+                [err, success] = yield (0, globalfunction_1.to)(this.UserSevices.loginUser(req.body));
+                if (err)
+                    return (0, globalfunction_1.ReE)(res, err, 422);
+                ;
+                if (success) {
+                    return (0, globalfunction_1.Reponse)(res, { success }, 200);
+                }
+                return (0, globalfunction_1.ReE)(res, { message: 'invalid Username or password' }, 401);
+            }
         });
         this.express = (0, express_1.default)();
         this.router = express_1.default.Router();
@@ -45,6 +64,7 @@ class User {
      */
     get routes() {
         this.router.post('/register', this.registerUser);
+        this.router.post('/login', this.loginUser);
         return this.router;
     }
 }
