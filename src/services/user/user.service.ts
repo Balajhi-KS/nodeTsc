@@ -59,7 +59,13 @@ export class UserSevices {
           const authenticatedUser = await this.userModel.authenticate(body.userName, body.password);
           if (authenticatedUser) {
                let expiration_time = parseInt('15000');
-               let jwtToken = jwt.sign(authenticatedUser, 'key', { expiresIn: expiration_time });
+               const clonedObject = {
+                    id: authenticatedUser.id,
+                    firstName: authenticatedUser.firstName,
+                    lastName: authenticatedUser.lastName,
+                    userId: authenticatedUser.userId,
+               };
+               let jwtToken = jwt.sign(clonedObject, 'key', { expiresIn: expiration_time });
                return jwtToken;
           }
           return null;

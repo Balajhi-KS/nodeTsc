@@ -72,7 +72,13 @@ class UserSevices {
             const authenticatedUser = yield this.userModel.authenticate(body.userName, body.password);
             if (authenticatedUser) {
                 let expiration_time = parseInt('15000');
-                let jwtToken = jsonwebtoken_1.default.sign(authenticatedUser, 'key', { expiresIn: expiration_time });
+                const clonedObject = {
+                    id: authenticatedUser.id,
+                    firstName: authenticatedUser.firstName,
+                    lastName: authenticatedUser.lastName,
+                    userId: authenticatedUser.userId,
+                };
+                let jwtToken = jsonwebtoken_1.default.sign(clonedObject, 'key', { expiresIn: expiration_time });
                 return jwtToken;
             }
             return null;
