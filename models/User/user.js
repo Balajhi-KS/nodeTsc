@@ -17,10 +17,8 @@ const crypto_1 = __importDefault(require("crypto"));
 module.exports = (sequelize, DataTypes) => {
     class User extends sequelize_1.Model {
         static associate(models) {
-            console.log(models, 'modelllllll');
-            // User.belongsTo(models.User, { foreignKey: 'UserId' });
-            //    User.hasMany(models.expenses,{foreignKey:'UserId'});
-            //    User.hasMany(models.UserPlaningAmount,{foreignKey:'UserId'});
+            console.log(models);
+            User.hasMany(models.userLoginDetails, { foreignKey: 'userId' });
         }
     }
     User.authenticate = function (email, password) {

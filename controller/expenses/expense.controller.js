@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const expense_service_1 = require("../../services/expenses/expense.service");
 // import { GlobalFunction } from '../../globalfunction';
 const globalfunction_1 = require("../../globalfunction");
+const passport_1 = __importDefault(require("passport"));
 const experess_validator_1 = require("../../validator/experess.validator");
 const validate_schema_1 = require("../../middleware/validate-schema");
 class Expense {
@@ -60,9 +61,9 @@ class Expense {
     }
     get routes() {
         // passport.authenticate('jwt', { session: false }),
-        this.router.post('/category', experess_validator_1.expenseValidator.createCategory, validate_schema_1.validate, this.createCategorys);
-        this.router.get('/category', this.getAllCategory);
-        this.router.post('/daily/expenses', this.createDailyExpenses);
+        this.router.post('/category', experess_validator_1.expenseValidator.createCategory, validate_schema_1.validate, passport_1.default.authenticate('jwt', { session: false }), this.createCategorys);
+        this.router.get('/category', passport_1.default.authenticate('jwt', { session: false }), this.getAllCategory);
+        this.router.post('/daily/expenses', passport_1.default.authenticate('jwt', { session: false }), this.createDailyExpenses);
         return this.router;
     }
 }

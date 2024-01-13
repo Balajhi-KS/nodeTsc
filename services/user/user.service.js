@@ -16,9 +16,12 @@ exports.UserSevices = void 0;
 const globalfunction_1 = require("../../globalfunction");
 const models_1 = require("../../models");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const crypto_1 = __importDefault(require("crypto"));
+const common_service_1 = require("../commonService/common.service");
 class UserSevices {
     constructor() {
         this.userModel = models_1.dbInstance.user;
+        this.userLoginDetailsModel = models_1.dbInstance.userLoginDetails;
         /**
          * Create New user
          * @param body
@@ -78,11 +81,23 @@ class UserSevices {
                     lastName: authenticatedUser.lastName,
                     userId: authenticatedUser.userId,
                 };
-                let jwtToken = jsonwebtoken_1.default.sign(clonedObject, 'key', { expiresIn: expiration_time });
-                return jwtToken;
+                console.log(this.generateRandomCodeSecure());
+                console.log(clonedObject, 'clonedObject000');
+                const token = this.generateRandomCodeSecure();
+                const [createTokenErr, createToken] = yield (0, globalfunction_1.to)(this.userLoginDetailsModel.create({ userToken: token, loginTime: Date.now(), userId: authenticatedUser.id }));
+                if (createTokenErr)
+                    return createTokenErr.message;
+                console.log(createToken, 'createToken');
+                let jwtToken = 'Bearer ' + jsonwebtoken_1.default.sign(clonedObject, process.env.SECRETKEY, { expiresIn: expiration_time });
+                return this.commonSevices.encryptDetails(JSON.stringify({ jwtToken: jwtToken, id: token }));
             }
             return null;
         });
+        this.commonSevices = new common_service_1.CommonSevices();
+    }
+    generateRandomCodeSecure() {
+        const buffer = crypto_1.default.randomBytes(8);
+        return buffer.readUInt32LE(0).toString() + buffer.readUInt32LE(4).toString();
     }
 }
 exports.UserSevices = UserSevices;

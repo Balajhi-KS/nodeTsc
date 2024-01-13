@@ -35,6 +35,7 @@ const models_1 = require("./models");
 const config_1 = require("./config/config");
 const helmet_1 = __importDefault(require("helmet"));
 const passport_1 = require("./middleware/passport");
+const userVerify_1 = require("./middleware/userVerify");
 const morgan_1 = __importDefault(require("morgan"));
 dotenv.config();
 class App {
@@ -43,6 +44,8 @@ class App {
         this.express = (0, express_1.default)();
         this.express.use((0, cors_1.default)());
         this.express.use((0, helmet_1.default)());
+        this.userVerify = new userVerify_1.UserVerify();
+        console.log(this.userVerify);
         this.mountRoutes();
     }
     mountRoutes() {
@@ -51,6 +54,14 @@ class App {
         this.express.use((0, morgan_1.default)('dev'));
         this.express.use(body_parser_1.default.json({ limit: '10mb' }));
         this.express.use(body_parser_1.default.urlencoded({ extended: true }));
+        this.express.use((req, res, next) => {
+            console.log(this.userVerify, 'this.userVerify');
+            if (req && req.headers && req.headers.authorization) {
+                const token = this.userVerify.checkUseToken(req.headers.authorization);
+                console.log(token, 'token');
+            }
+            next();
+        });
         this.express.use(function (req, res, next) {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

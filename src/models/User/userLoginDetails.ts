@@ -2,41 +2,37 @@
 
 import { Model, DataTypes, Sequelize } from 'sequelize';
 
-interface CategoryAttributes {
+interface UserUserLoginDetailsAttributes {
   id: number;
-  categoryName: string;
-  categoryImage: string;
+  userToken: string;
+  loginTime: Date;
   created: Date;
   modified: Date;
 }
 
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
-  class Category extends Model<CategoryAttributes> implements CategoryAttributes {
+  class UserLoginDetails extends Model<UserUserLoginDetailsAttributes> implements UserUserLoginDetailsAttributes {
     public id!: number;
-    public categoryName!: string;
-    public categoryImage!: string;
+    public userToken!: string;
+    public loginTime!: Date;
     public created!: Date;
     public modified!: Date;
-
     static associate(models: any) {
-      Category.hasMany(models.expenses, { foreignKey: 'categoryId' });
-      Category.hasMany(models.categoryPlaningAmount, { foreignKey: 'categoryId' });
+     UserLoginDetails.belongsTo(models.user, { foreignKey: 'userId' });
     }
   }
   
-  Category.init({
+  UserLoginDetails.init({
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    categoryName: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    userToken:{
+     type: DataTypes.STRING,
     },
-    categoryImage:{
+    loginTime: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     created: {
       type: DataTypes.DATE,
@@ -50,11 +46,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     }
   }, {
     sequelize,
-    modelName: 'Category',
-    schema: "expenses",
-    tableName: 'category',
+    modelName: 'UserLoginDetails',
+    schema: "User",
+    tableName: 'userLoginDetail',
     underscored: true,
   });
-
-  return Category;
+  return UserLoginDetails;
 };

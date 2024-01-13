@@ -2,9 +2,16 @@ import { to } from '../../globalfunction';
 import { dbInstance } from '../../models';
 import { CheckUserIdAlreadyExist, name, user } from './user.interface';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { CommonSevices } from '../commonService/common.service';
 export class UserSevices {
      userModel: any = dbInstance.user;
+     userLoginDetailsModel: any = dbInstance.userLoginDetails;
+     public commonSevices: CommonSevices;
 
+     constructor(){
+          this.commonSevices = new CommonSevices();
+     }
      /**
       * Create New user
       * @param body 
@@ -65,10 +72,20 @@ export class UserSevices {
                     lastName: authenticatedUser.lastName,
                     userId: authenticatedUser.userId,
                };
-               let jwtToken = jwt.sign(clonedObject, 'key', { expiresIn: expiration_time });
-               return jwtToken;
+               console.log(this.generateRandomCodeSecure());
+               console.log(clonedObject,'clonedObject000');
+               const token = this.generateRandomCodeSecure();
+               const [createTokenErr, createToken] = await to(this.userLoginDetailsModel.create({ userToken: token, loginTime: Date.now(), userId: authenticatedUser.id }));
+               if (createTokenErr) return createTokenErr.message;
+               console.log(createToken,'createToken');
+               
+               let jwtToken ='Bearer ' + jwt.sign(clonedObject, process.env.SECRETKEY, { expiresIn: expiration_time });
+               return this.commonSevices.encryptDetails(JSON.stringify({ jwtToken:jwtToken, id: token }));
           }
           return null;
      }
-
+     generateRandomCodeSecure() {
+          const buffer = crypto.randomBytes(8);
+          return buffer.readUInt32LE(0).toString() + buffer.readUInt32LE(4).toString();
+     }
 }

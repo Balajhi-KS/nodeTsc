@@ -31,10 +31,8 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public checkPassword!: string;
     public salt!: string;
     static associate(models: any) {
-      console.log(models,'modelllllll');
-        // User.belongsTo(models.User, { foreignKey: 'UserId' });
-     //    User.hasMany(models.expenses,{foreignKey:'UserId'});
-     //    User.hasMany(models.UserPlaningAmount,{foreignKey:'UserId'});
+      console.log(models)
+      User.hasMany(models.userLoginDetails, { foreignKey: 'userId' });
     }
     static authenticate = async function (email: string, password: string): Promise<User | null> {
       const user = await this.findOne({ 

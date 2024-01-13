@@ -5,7 +5,7 @@ const JwtStrategy = Strategy;
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey:  'password'
+    secretOrKey:  process.env.SECRETKEY
   };
   
   // Usage example for the JwtStrategy

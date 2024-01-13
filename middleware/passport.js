@@ -19,7 +19,7 @@ exports.passport = passport_1.default;
 const JwtStrategy = passport_jwt_1.Strategy;
 const jwtOptions = {
     jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: 'password'
+    secretOrKey: process.env.SECRETKEY
 };
 // Usage example for the JwtStrategy
 passport_1.default.use(new JwtStrategy(jwtOptions, (jwtPayload, done) => __awaiter(void 0, void 0, void 0, function* () {

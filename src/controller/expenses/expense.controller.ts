@@ -52,9 +52,9 @@ export class Expense {
 
      get routes() {
           // passport.authenticate('jwt', { session: false }),
-          this.router.post('/category', expenseValidator.createCategory,validate ,this.createCategorys);
-          this.router.get('/category', this.getAllCategory);
-          this.router.post('/daily/expenses', this.createDailyExpenses);
+          this.router.post('/category', expenseValidator.createCategory,validate ,passport.authenticate('jwt',{session:false}),this.createCategorys);
+          this.router.get('/category', passport.authenticate('jwt', { session: false }), this.getAllCategory);
+          this.router.post('/daily/expenses', passport.authenticate('jwt', { session: false }), this.createDailyExpenses);
           return this.router;
      }
 };

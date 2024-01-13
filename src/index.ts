@@ -8,18 +8,23 @@ import * as dotenv from 'dotenv';
 import { sequelize } from './models';
 import { CONFIG } from './config/config';
 import helmet from 'helmet';
-import {passport} from './middleware/passport';
+import { passport } from './middleware/passport';
+import { UserVerify } from './middleware/userVerify';
 import logger from 'morgan';
+import jsonwebtoken from 'jsonwebtoken';
 
 dotenv.config();
 class App {
     public express: express.Application;
+    public userVerify: UserVerify;
 
     // public routes: Routes;
     constructor() {
         this.express = express();
         this.express.use(cors());
         this.express.use(helmet());
+        this.userVerify = new UserVerify();
+        console.log(this.userVerify);
         this.mountRoutes();
     }
     private mountRoutes(): void {
@@ -28,6 +33,14 @@ class App {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json({ limit: '10mb' }));
         this.express.use(bodyParser.urlencoded({ extended: true }));
+        this.express.use((req: Request, res: Response, next: NextFunction)=> {
+            console.log(this.userVerify,'this.userVerify')
+            if(req && req.headers && req.headers.authorization){
+              const token =  this.userVerify.checkUseToken(req.headers.authorization);
+              console.log(token,'token');
+            }
+            next();
+        });
         this.express.use(function (req: Request, res: Response, next: NextFunction) {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
