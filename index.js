@@ -58,7 +58,8 @@ class App {
             console.log(this.userVerify, 'this.userVerify');
             if (req && req.headers && req.headers.authorization) {
                 const token = this.userVerify.checkUseToken(req.headers.authorization);
-                console.log(token, 'token');
+                req.headers.authorization = token === null || token === void 0 ? void 0 : token.jwtToken;
+                req['userToken'] = token === null || token === void 0 ? void 0 : token.id;
             }
             next();
         });

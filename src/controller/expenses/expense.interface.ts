@@ -1,6 +1,11 @@
 interface createExpense {
      Spend: number,
      Balance: number,
-     Reason: string
+     Reason: string,
+     categoryId:number,
 }
-export { createExpense }
+interface planingAmount {
+     planingAmount:number,
+     categoryId:number,
+}
+export { createExpense ,planingAmount}

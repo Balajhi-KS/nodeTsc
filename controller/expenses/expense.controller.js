@@ -34,7 +34,7 @@ class Expense {
         this.getAllCategory = (req, res) => __awaiter(this, void 0, void 0, function* () {
             let err, success;
             if (req) {
-                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.getAllCategory());
+                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.getAllCategory(req.user['id']));
             }
             if (err)
                 return (0, globalfunction_1.ReE)(res, err, 422);
@@ -47,13 +47,40 @@ class Expense {
                 let data = {
                     spend: body === null || body === void 0 ? void 0 : body.Spend,
                     balance: body === null || body === void 0 ? void 0 : body.Balance,
-                    reason: body === null || body === void 0 ? void 0 : body.Reason
+                    reason: body === null || body === void 0 ? void 0 : body.Reason,
+                    userId: req.user['id'],
+                    categoryId: body === null || body === void 0 ? void 0 : body.categoryId
                 };
                 [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.createDailyExpenses(data));
             }
             if (err)
                 return (0, globalfunction_1.ReE)(res, err, 422);
             return (0, globalfunction_1.Reponse)(res, { success: "Daily Expenses created successfully" }, 200);
+        });
+        this.createExpensePlaning = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let err, success, body;
+            console.log(req.user);
+            if (req && req.body) {
+                body = req.body;
+                let data = {
+                    planingAmount: body === null || body === void 0 ? void 0 : body.planingAmount,
+                    userId: req.user['id'],
+                    categoryId: body === null || body === void 0 ? void 0 : body.categoryId
+                };
+                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.createExpensePlaning(data));
+            }
+            if (err)
+                return (0, globalfunction_1.ReE)(res, err, 422);
+            return (0, globalfunction_1.Reponse)(res, { success: "Daily Expenses created successfully" }, 200);
+        });
+        this.getAllExpenses = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let err, success;
+            if (req) {
+                [err, success] = yield (0, globalfunction_1.to)(this.expenseSevices.getAllExpenses(req.user['id']));
+            }
+            if (err)
+                return (0, globalfunction_1.ReE)(res, err, 422);
+            return (0, globalfunction_1.Reponse)(res, { success: success }, 200);
         });
         this.express = (0, express_1.default)();
         this.router = express_1.default.Router();
@@ -63,6 +90,8 @@ class Expense {
         // passport.authenticate('jwt', { session: false }),
         this.router.post('/category', experess_validator_1.expenseValidator.createCategory, validate_schema_1.validate, passport_1.default.authenticate('jwt', { session: false }), this.createCategorys);
         this.router.get('/category', passport_1.default.authenticate('jwt', { session: false }), this.getAllCategory);
+        this.router.get('/expense', passport_1.default.authenticate('jwt', { session: false }), this.getAllExpenses);
+        this.router.post('/planing', passport_1.default.authenticate('jwt', { session: false }), this.createExpensePlaning);
         this.router.post('/daily/expenses', passport_1.default.authenticate('jwt', { session: false }), this.createDailyExpenses);
         return this.router;
     }

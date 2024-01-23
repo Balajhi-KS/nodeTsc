@@ -16,10 +16,12 @@ const models_1 = require("../../models"); // Update the path to the correct loca
 // import { Expenses } from '../../models/expenses'; // Update the path to the correct location
 // const { Category } = require('./models');
 // import { Category } from '../../models' as any;
+const sequelize_1 = require("sequelize");
 class ExpenseSevices {
     constructor() {
         this.categoryModel = models_1.dbInstance.category;
         this.expensesModel = models_1.dbInstance.expenses;
+        this.categoryPlaningAmount = models_1.dbInstance.categoryPlaningAmount;
         // constructor(){
         // }
         this.createCategory = (data) => __awaiter(this, void 0, void 0, function* () {
@@ -31,9 +33,10 @@ class ExpenseSevices {
             }
             return createCategorySuccess;
         });
-        this.getAllCategory = () => __awaiter(this, void 0, void 0, function* () {
+        this.getAllCategory = (userId) => __awaiter(this, void 0, void 0, function* () {
             let createCategoryErr, createCategorySuccess;
             [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.categoryModel.findAll({
+                where: { [sequelize_1.Op.or]: [{ userId: userId }, { userId: null }] },
                 attributes: ['id', 'categoryName', 'categoryImage']
             }));
             if (createCategoryErr) {
@@ -51,13 +54,37 @@ class ExpenseSevices {
             }
             return createCategorySuccess;
         });
-        // createExpense = async function (data) {
-        //      let createCategoryErr, createCategorySuccess;
-        //      console.log(data,'fhgsjh');
-        //      [createCategoryErr, createCategorySuccess] = await this.to(expenseModel.create(data));
-        //      if (createCategoryErr) return this.TE(createCategoryErr.message);
-        //      return createCategorySuccess;
-        // }
+        this.createExpensePlaning = function (data) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let createExpensePlaningErr, createExpensePlaningSuccess;
+                [createExpensePlaningErr, createExpensePlaningSuccess] = yield (0, globalfunction_1.to)(this.categoryPlaningAmount.create(data));
+                if (createExpensePlaningErr)
+                    return this.TE(createExpensePlaningErr.message);
+                return createExpensePlaningSuccess;
+            });
+        };
+        this.getAllExpenses = (userId) => __awaiter(this, void 0, void 0, function* () {
+            let getExpensesErr, getExpensesSuccess;
+            [getExpensesErr, getExpensesSuccess] = yield (0, globalfunction_1.to)(this.expensesModel.findAll({
+                where: { userId: userId },
+                attributes: ['id', 'spend', 'balance', 'reason'],
+                include: {
+                    model: this.categoryModel,
+                    where: { [sequelize_1.Op.or]: [{ userId: userId }, { userId: null }] },
+                    attributes: ['id', 'categoryName', 'categoryImage'],
+                    include: {
+                        model: this.categoryPlaningAmount,
+                        where: { userId: userId },
+                        attributes: ['id', 'planingAmount']
+                    }
+                }
+            }));
+            if (getExpensesErr) {
+                console.log('getExpensesErr', getExpensesErr);
+                return (0, globalfunction_1.TE)(getExpensesErr.message, true);
+            }
+            return getExpensesSuccess;
+        });
     }
 }
 exports.ExpenseSevices = ExpenseSevices;

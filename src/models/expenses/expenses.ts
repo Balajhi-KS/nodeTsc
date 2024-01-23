@@ -6,6 +6,7 @@ interface ExpensesAttributes {
   id: number;
   spend: number;
   balance: number;
+  userId: number;
   reason: string;
   created: Date;
   modified: Date;
@@ -17,6 +18,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public id!: number;
     public spend!: number;
     public balance!: number;
+    public userId!: number;
     public reason!: string;
     public created!: Date;
     public modified!: Date;
@@ -43,6 +45,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     },
     reason: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    userId:{
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     created: {
