@@ -8,15 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExpenseSevices = void 0;
 // import { GlobalFunction } from "../../globalfunction";
+const sequelize_1 = __importDefault(require("sequelize"));
 const globalfunction_1 = require("../../globalfunction");
 const models_1 = require("../../models"); // Update the path to the correct location
 // import { Expenses } from '../../models/expenses'; // Update the path to the correct location
 // const { Category } = require('./models');
 // import { Category } from '../../models' as any;
-const sequelize_1 = require("sequelize");
+const sequelize_2 = require("sequelize");
 class ExpenseSevices {
     constructor() {
         this.categoryModel = models_1.dbInstance.category;
@@ -36,7 +40,7 @@ class ExpenseSevices {
         this.getAllCategory = (userId) => __awaiter(this, void 0, void 0, function* () {
             let createCategoryErr, createCategorySuccess;
             [createCategoryErr, createCategorySuccess] = yield (0, globalfunction_1.to)(this.categoryModel.findAll({
-                where: { [sequelize_1.Op.or]: [{ userId: userId }, { userId: null }] },
+                where: { [sequelize_2.Op.or]: [{ userId: userId }, { userId: null }] },
                 attributes: ['id', 'categoryName', 'categoryImage']
             }));
             if (createCategoryErr) {
@@ -65,19 +69,20 @@ class ExpenseSevices {
         };
         this.getAllExpenses = (userId) => __awaiter(this, void 0, void 0, function* () {
             let getExpensesErr, getExpensesSuccess;
-            [getExpensesErr, getExpensesSuccess] = yield (0, globalfunction_1.to)(this.expensesModel.findAll({
-                where: { userId: userId },
-                attributes: ['id', 'spend', 'balance', 'reason'],
-                include: {
-                    model: this.categoryModel,
-                    where: { [sequelize_1.Op.or]: [{ userId: userId }, { userId: null }] },
-                    attributes: ['id', 'categoryName', 'categoryImage'],
-                    include: {
+            [getExpensesErr, getExpensesSuccess] = yield (0, globalfunction_1.to)(this.categoryModel.findAll({
+                where: { [sequelize_2.Op.or]: [{ userId: userId }, { userId: null }] },
+                attributes: ['id', 'categoryName', 'categoryImage', [sequelize_1.default.fn('sum', sequelize_1.default.col('spend')), 'total_amount']],
+                include: [{
+                        required: false,
+                        model: this.expensesModel,
+                        attributes: ['id', 'spend', 'balance', 'reason'],
+                    }, {
                         model: this.categoryPlaningAmount,
+                        required: false,
                         where: { userId: userId },
                         attributes: ['id', 'planingAmount']
-                    }
-                }
+                    }],
+                group: ['Category.id', 'CategoryPlans.id', 'Category.category_name', 'Category.category_image', 'Expenses.id', 'Expenses.spend', 'Expenses.balance', 'Expenses.reason']
             }));
             if (getExpensesErr) {
                 console.log('getExpensesErr', getExpensesErr);

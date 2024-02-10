@@ -65,6 +65,9 @@ class User {
     get routes() {
         this.router.post('/register', this.registerUser);
         this.router.post('/login', this.loginUser);
+        this.router.get('/temp', (req, res) => {
+            res.send(`Hello`);
+        });
         return this.router;
     }
 }

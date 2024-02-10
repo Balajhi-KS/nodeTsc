@@ -1,4 +1,5 @@
 // import { GlobalFunction } from "../../globalfunction";
+import sequelize from 'sequelize';
 import { TE, to, Reponse, ReE } from '../../globalfunction';
 import { dbInstance } from '../../models'; // Update the path to the correct location
 // import { Expenses } from '../../models/expenses'; // Update the path to the correct location
@@ -54,19 +55,21 @@ export class ExpenseSevices {
      }
      getAllExpenses = async (userId:number) => {
           let getExpensesErr: Error, getExpensesSuccess;
-          [getExpensesErr, getExpensesSuccess] = await to(this.expensesModel.findAll({
-               where: { userId: userId },
-               attributes: ['id', 'spend', 'balance', 'reason'],
-               include: {
-                    model: this.categoryModel,
-                    where: { [Op.or]: [{ userId: userId }, { userId: null }] },
-                    attributes: ['id', 'categoryName', 'categoryImage'],
-                    include: {
-                         model: this.categoryPlaningAmount,
-                         where: { userId: userId },
-                         attributes: ['id', 'planingAmount']
-                    }
-               }
+
+          [getExpensesErr, getExpensesSuccess] = await to(this.categoryModel.findAll({
+               where: { [Op.or]: [{ userId: userId }, { userId: null }] },
+               attributes: ['id', 'categoryName', 'categoryImage',[sequelize.fn('sum', sequelize.col('spend')), 'total_amount']],
+               include: [{
+                    required:false,
+                    model: this.expensesModel,
+                    attributes: ['id', 'spend', 'balance', 'reason'],
+                 },{
+                    model: this.categoryPlaningAmount,
+                    required:false,
+                    where: { userId: userId },
+                    attributes: ['id', 'planingAmount']
+               }],
+               group: ['Category.id','CategoryPlans.id' ,'Category.category_name', 'Category.category_image', 'Expenses.id', 'Expenses.spend', 'Expenses.balance', 'Expenses.reason']
           }));
           if (getExpensesErr) {
                console.log('getExpensesErr', getExpensesErr)

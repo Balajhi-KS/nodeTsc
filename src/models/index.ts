@@ -16,7 +16,7 @@ const sequelize = new Sequelize({
      host: CONFIG.db_host,
      dialect: CONFIG.db_dialect,
      port: 5432,
-     logging: false,
+     logging: true,
      define: {
           timestamps: false,
           underscored: true,
