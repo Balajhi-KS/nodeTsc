@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import { Model, DataTypes, Sequelize } from 'sequelize';
-import crypto from 'crypto';
+import { Model, DataTypes, Sequelize } from "sequelize";
+import crypto from "crypto";
 
 interface UserAttributes {
   id: number;
@@ -31,83 +31,97 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public checkPassword!: string;
     public salt!: string;
     static associate(models: any) {
-      User.hasMany(models.userLoginDetails, { foreignKey: 'userId' });
+      User.hasMany(models.userLoginDetails, { foreignKey: "userId" });
     }
-    static authenticate = async function (email: string, password: string): Promise<User | null> {
-      const user = await this.findOne({ 
+    static authenticate = async function (
+      email: string,
+      password: string
+    ): Promise<User | null> {
+      const user = await this.findOne({
         where: { email },
-        attributes:['id','firstName','lastName','userId','email','phone','password'] 
+        attributes: [
+          "id",
+          "firstName",
+          "lastName",
+          "userId",
+          "email",
+          "phone",
+          "password",
+        ],
       });
       this.checkPassword = user?.dataValues?.password;
       this.salt = this.checkPassword.slice(0, 16);
       if (user && this.checkPassword && this.salt) {
         let hash: any;
-        hash = crypto.createHash('sha256');
+        hash = crypto.createHash("sha256");
         hash.update(password + this.salt);
-        if(this.checkPassword === (this.salt + hash.digest('hex'))){
+        if (this.checkPassword === this.salt + hash.digest("hex")) {
           delete user?.dataValues?.password;
           return user?.dataValues;
-        } 
+        }
       }
       return null;
     };
   }
-  
-  User.init({
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+
+  User.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        // allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      created: {
+        type: DataTypes.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
+      },
+      modified: {
+        type: DataTypes.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
+      },
     },
-    firstName:{
-     type: DataTypes.STRING,
-     allowNull: false,
-    },
-    lastName:{
-     type: DataTypes.STRING,
-     allowNull: false,
-    },
-    userId:{
-     type: DataTypes.STRING,
-     allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    phone: {
-      type: DataTypes.STRING,
-      // allowNull: false,
-    },
-    password:{
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    created: {
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-      allowNull: false,
-    },
-    modified: {
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-      allowNull: false,
+    {
+      sequelize,
+      modelName: "User",
+      schema: "User",
+      tableName: "users",
+      underscored: true,
     }
-  }, {
-    sequelize,
-    modelName: 'User',
-    schema: "User",
-    tableName: 'users',
-    underscored: true,
-  });
+  );
 
   User.beforeSave(async (user, options) => {
-    if (user.changed('password')) {
+    if (user.changed("password")) {
       let salt: string, hash: any;
-      salt = crypto.randomBytes(8).toString('hex');
-      hash = crypto.createHash('sha256');
+      salt = crypto.randomBytes(8).toString("hex");
+      hash = crypto.createHash("sha256");
       hash.update(user.password + salt);
-      user.password = salt + hash.digest('hex');
+      user.password = salt + hash.digest("hex");
     }
   });
 

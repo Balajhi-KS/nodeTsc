@@ -1,63 +1,68 @@
-import express, { Application, Request, Response, NextFunction, Router } from 'express'
-import { UserSevices } from '../../services/user/user.service';
-import { ReE, Reponse, TE, to } from '../../globalfunction';
-import { CheckUserIdAlreadyExist } from '../../Module/User/user.interface';
-
+import express, {
+  Application,
+  Request,
+  Response,
+  NextFunction,
+  Router,
+} from "express";
+import { UserSevices } from "../../services/user/user.service";
+import { ReE, Reponse, TE, to } from "../../globalfunction";
+import { CheckUserIdAlreadyExist } from "../../Module/User/user.interface";
 
 export class User {
-     private router: express.Router;
-     private UserSevices: UserSevices;
+  private router: express.Router;
+  private UserSevices: UserSevices;
 
-     /**
-      * Init declaration
-      */
-     constructor() {
-          this.router = express.Router();
-          this.UserSevices = new UserSevices();
-     }
+  /**
+   * Init declaration
+   */
+  constructor() {
+    this.router = express.Router();
+    this.UserSevices = new UserSevices();
+  }
 
-     /**
-      * Register new user
-      * @param req body data
-      * @param res success message
-      * @returns success message
-      */
-     registerUser = async (req: Request, res: Response) => {
-          let err: Error, success: CheckUserIdAlreadyExist;
+  /**
+   * Register new user
+   * @param req body data
+   * @param res success message
+   * @returns success message
+   */
+  registerUser = async (req: Request, res: Response) => {
+    let err: Error, success: CheckUserIdAlreadyExist;
 
-          if (req && req.body) {
-               [err, success] = await to(this.UserSevices.registerUser(req.body));
-          }
-          if (err) return ReE(res, { message: 'Unable to Register User' }, 422);
-          return Reponse(res, { success: "User Created successfully" }, 200);
-     }
-     /**
-      * Register new user
-      * @param req body data
-      * @param res success message
-      * @returns success message
-      */
-     loginUser = async (req: Request, res: Response) => {
-          let err: Error, response: any;
-          if (req && req.body) {
-               [err, response] = await to(this.UserSevices.loginUser(req.body));
-               if (err) return ReE(res, err, 422);;
-               if (response) {
-                    return Reponse(res, response, 200);
-               }
-               return ReE(res, { message: 'invalid Username or password' }, 401);
-          }
-     }
+    if (req && req.body) {
+      [err, success] = await to(this.UserSevices.registerUser(req.body));
+    }
+    if (err) return ReE(res, { message: "Unable to Register User" }, 422);
+    return Reponse(res, { success: "User Created successfully" }, 200);
+  };
+  /**
+   * Register new user
+   * @param req body data
+   * @param res success message
+   * @returns success message
+   */
+  loginUser = async (req: Request, res: Response) => {
+    let err: Error, response: any;
+    if (req && req.body) {
+      [err, response] = await to(this.UserSevices.loginUser(req.body));
+      if (err) return ReE(res, err, 422);
+      if (response) {
+        return Reponse(res, response, 200);
+      }
+      return ReE(res, { message: "invalid Username or password" }, 401);
+    }
+  };
 
-     /**
-      * Access router
-      */
-     get routes() {
-          this.router.post('/register', this.registerUser);
-          this.router.post('/login', this.loginUser);
-          this.router.get('/temp', (req, res) => {
-               res.send(`Hello`);
-          });
-          return this.router;
-     }
+  /**
+   * Access router
+   */
+  get routes() {
+    this.router.post("/register", this.registerUser);
+    this.router.post("/login", this.loginUser);
+    this.router.get("/temp", (req, res) => {
+      res.send(`Hello`);
+    });
+    return this.router;
+  }
 }

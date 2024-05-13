@@ -1,24 +1,25 @@
-require('dotenv').config();//instatiate environment variables
+require("dotenv").config(); //instatiate environment variables
 
-const CONFIG:any= {}; //Make this global to use all over the application
+const CONFIG: any = {}; //Make this global to use all over the application
 
-CONFIG.app = process.env.APP || 'local';
-CONFIG.port = process.env.PORT || '3000';
+CONFIG.app = process.env.APP || "local";
+CONFIG.port = process.env.PORT || "3000";
 
-CONFIG.db_dialect = process.env.DB_DIALECT || 'postgres';
-CONFIG.db_host = process.env.DB_HOST || 'postgresql-arunramesh.alwaysdata.net';
-CONFIG.db_port = process.env.DB_PORT || '5432';
-CONFIG.db_name = process.env.DB_NAME || 'arunramesh_343';
-CONFIG.db_user = process.env.DB_USER || 'arunramesh';
-CONFIG.db_password = process.env.DB_PASSWORD || 'arunRamesh@1234';
+CONFIG.db_dialect = process.env.DB_DIALECT || "postgres";
+CONFIG.db_host = process.env.DB_HOST || "postgresql-arunramesh.alwaysdata.net";
+CONFIG.db_port = process.env.DB_PORT || "5432";
+CONFIG.db_name = process.env.DB_NAME || "arunramesh_343";
+CONFIG.db_user = process.env.DB_USER || "arunramesh";
+CONFIG.db_password = process.env.DB_PASSWORD || "arunRamesh@1234";
 
-CONFIG.max_pool_conn = process.env.MAX_POOL_CONN || '50';
-CONFIG.min_pool_conn = process.env.MIN_POOL_CONN || '0';
-CONFIG.conn_idle_time = process.env.CONN_IDLE_TIME || '10000';
+CONFIG.max_pool_conn = process.env.MAX_POOL_CONN || "50";
+CONFIG.min_pool_conn = process.env.MIN_POOL_CONN || "0";
+CONFIG.conn_idle_time = process.env.CONN_IDLE_TIME || "10000";
 
-CONFIG.jwt_encryption = process.env.JWT_ENCRYPTION || 'please_change';
-CONFIG.jwt_expiration = process.env.JWT_EXPIRATION || '1800000';
-CONFIG.refresh_token_expiration = process.env.REFRESH_TOKEN_EXPIRATION || '1800000';
+CONFIG.jwt_encryption = process.env.JWT_ENCRYPTION || "please_change";
+CONFIG.jwt_expiration = process.env.JWT_EXPIRATION || "1800000";
+CONFIG.refresh_token_expiration =
+  process.env.REFRESH_TOKEN_EXPIRATION || "1800000";
 
-CONFIG.secretKey = process.env.SECRETKEY || 'myapp';
-export {CONFIG}
+CONFIG.secretKey = process.env.SECRETKEY || "myapp";
+export { CONFIG };
