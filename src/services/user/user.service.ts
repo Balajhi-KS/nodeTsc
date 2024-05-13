@@ -1,6 +1,6 @@
 import { to } from '../../globalfunction';
 import { dbInstance } from '../../models';
-import { CheckUserIdAlreadyExist, name, user } from './user.interface';
+import { CheckUserIdAlreadyExist, name, user } from '../../Module/User/user.interface';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { CommonSevices } from '../commonService/common.service';
@@ -19,7 +19,11 @@ export class UserSevices {
       */
      registerUser = async (body: user) => {
           let createRandomErr: Error, createRandomId: string, userErr: Error, user: CheckUserIdAlreadyExist;
-          [createRandomErr, createRandomId] = await to(this.createRandomUserId({ firstName: body.firstName, lastName: body.lastName }));
+          [createRandomErr, createRandomId] = await to(this.createRandomUserId({
+                firstName: body.firstName,
+                lastName: body.lastName 
+               }));
+
           let data = {
                firstName: body.firstName,
                lastName: body.lastName,
@@ -28,6 +32,7 @@ export class UserSevices {
                phone: body.phone,
                password: body.password
           };
+
           [userErr, user] = await to(this.userModel.create(data));
           if (userErr) return userErr;
           return user;
@@ -57,7 +62,11 @@ export class UserSevices {
 
      checkAleadyExist = async (userId: string) => {
           let checkUserIdAleadyExistErr: Error, checkUserIdAleadyExist: CheckUserIdAlreadyExist | null;
-          [checkUserIdAleadyExistErr, checkUserIdAleadyExist] = await to(this.userModel.findOne({ where: { userId: userId } }));
+
+          [checkUserIdAleadyExistErr, checkUserIdAleadyExist] = await to(this.userModel.findOne({ 
+               where: { userId: userId } 
+          }));
+
           if (checkUserIdAleadyExistErr) return checkUserIdAleadyExistErr;
           return checkUserIdAleadyExist;
      }
@@ -66,21 +75,30 @@ export class UserSevices {
           const authenticatedUser = await this.userModel.authenticate(body.userName, body.password);
           if (authenticatedUser) {
                let expiration_time = parseInt('15000');
+
+               const keyPair = this.commonSevices.generateRSAKeys();
+               const token = this.generateRandomCodeSecure();
+               const [createTokenErr, createToken] = await to(this.userLoginDetailsModel.create({ 
+                    userToken: token, 
+                    loginTime: Date.now(), 
+                    userId: authenticatedUser.id, 
+                    rsakeys : keyPair 
+               }));
+
+               if (createTokenErr) return createTokenErr.message;      
                const clonedObject = {
                     id: authenticatedUser.id,
                     firstName: authenticatedUser.firstName,
                     lastName: authenticatedUser.lastName,
                     userId: authenticatedUser.userId,
+                    validateToken:token
                };
-               console.log(this.generateRandomCodeSecure());
-               console.log(clonedObject,'clonedObject000');
-               const token = this.generateRandomCodeSecure();
-               const [createTokenErr, createToken] = await to(this.userLoginDetailsModel.create({ userToken: token, loginTime: Date.now(), userId: authenticatedUser.id }));
-               if (createTokenErr) return createTokenErr.message;
-               console.log(createToken,'createToken');
-               
                let jwtToken ='Bearer ' + jwt.sign(clonedObject, process.env.SECRETKEY, { expiresIn: expiration_time });
-               return this.commonSevices.encryptDetails(JSON.stringify({ jwtToken:jwtToken, id: token }));
+               
+               return { 
+                    encryptionKey:keyPair.publicKey, 
+                    token:this.commonSevices.encryptDetails(JSON.stringify({ jwtToken:jwtToken, id: token }))
+               };
           }
           return null;
      }

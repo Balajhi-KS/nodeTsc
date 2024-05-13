@@ -31,7 +31,6 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public checkPassword!: string;
     public salt!: string;
     static associate(models: any) {
-      console.log(models)
       User.hasMany(models.userLoginDetails, { foreignKey: 'userId' });
     }
     static authenticate = async function (email: string, password: string): Promise<User | null> {

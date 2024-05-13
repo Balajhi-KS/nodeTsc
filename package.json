@@ -10,7 +10,7 @@
     "postinstall": "npm run tsc",
     "dev": "ts-node-dev — respawn — pretty — transpile-only index.ts",
     "local": "ts-node src/index.ts",
-    "devs": "tsc-watch --onSuccess \"node ./index.js\""
+    "devs": "tsc-watch --onSuccess \"node ./dist/index.js\""
   },
   "keywords": [],
   "author": "",

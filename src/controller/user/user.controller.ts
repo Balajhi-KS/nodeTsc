@@ -1,19 +1,17 @@
 import express, { Application, Request, Response, NextFunction, Router } from 'express'
 import { UserSevices } from '../../services/user/user.service';
 import { ReE, Reponse, TE, to } from '../../globalfunction';
-import { CheckUserIdAlreadyExist } from '../../services/user/user.interface';
+import { CheckUserIdAlreadyExist } from '../../Module/User/user.interface';
 
 
 export class User {
-     public express: express.Application;
-     public router: express.Router;
-     public UserSevices: UserSevices;
+     private router: express.Router;
+     private UserSevices: UserSevices;
 
      /**
       * Init declaration
       */
      constructor() {
-          this.express = express();
           this.router = express.Router();
           this.UserSevices = new UserSevices();
      }
@@ -40,16 +38,17 @@ export class User {
       * @returns success message
       */
      loginUser = async (req: Request, res: Response) => {
-          let err: Error, success: any;
+          let err: Error, response: any;
           if (req && req.body) {
-               [err, success] = await to(this.UserSevices.loginUser(req.body));
+               [err, response] = await to(this.UserSevices.loginUser(req.body));
                if (err) return ReE(res, err, 422);;
-               if (success) {
-                    return Reponse(res, { success }, 200);
+               if (response) {
+                    return Reponse(res, response, 200);
                }
                return ReE(res, { message: 'invalid Username or password' }, 401);
           }
      }
+
      /**
       * Access router
       */
@@ -58,7 +57,7 @@ export class User {
           this.router.post('/login', this.loginUser);
           this.router.get('/temp', (req, res) => {
                res.send(`Hello`);
-             });
+          });
           return this.router;
      }
 }

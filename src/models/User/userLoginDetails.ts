@@ -6,6 +6,7 @@ interface UserUserLoginDetailsAttributes {
   id: number;
   userToken: string;
   loginTime: Date;
+  rsakeys: JSON;
   created: Date;
   modified: Date;
 }
@@ -15,6 +16,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public id!: number;
     public userToken!: string;
     public loginTime!: Date;
+    public rsakeys!: JSON;
     public created!: Date;
     public modified!: Date;
     static associate(models: any) {
@@ -33,6 +35,9 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     },
     loginTime: {
       type: DataTypes.STRING,
+    },
+    rsakeys: {
+      type: DataTypes.JSON,
     },
     created: {
       type: DataTypes.DATE,
