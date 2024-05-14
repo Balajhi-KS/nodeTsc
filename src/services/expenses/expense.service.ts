@@ -16,13 +16,30 @@ export class ExpenseSevices {
 
   // }
   createCategory = async (data) => {
-    let createCategoryErr: Error, createCategorySuccess;
+    let createCategoryErr: Error,
+      createCategorySuccess,
+      createCategoryPlanMappingErr: Error,
+      createCategoryPlanMapping;
+
     [createCategoryErr, createCategorySuccess] = await to(
       this.categoryModel.create(data)
     );
     if (createCategoryErr) {
       console.log("createCategoryErr", createCategoryErr);
       return TE(createCategoryErr.message, true);
+    }
+    if (createCategorySuccess.dataValues.id) {
+      let value = {
+        planingAmount: data?.planingAmount,
+        userId: data.user,
+        categoryId: createCategorySuccess.dataValues.id,
+      };
+      [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
+        this.createExpensePlaning(value)
+      );
+      if (createCategoryPlanMappingErr) {
+        return TE(createCategoryPlanMappingErr.message, true);
+      }
     }
     return createCategorySuccess;
   };
@@ -59,7 +76,7 @@ export class ExpenseSevices {
       this.categoryPlaningAmount.create(data)
     );
     if (createExpensePlaningErr)
-      return this.TE(createExpensePlaningErr.message);
+      return TE(createExpensePlaningErr.message, true);
     return createExpensePlaningSuccess;
   };
   getAllExpenses = async (userId: number) => {

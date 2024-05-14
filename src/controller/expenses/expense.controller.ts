@@ -24,7 +24,13 @@ export class ExpenseController {
   createCategorys = async (req: Request, res: Response) => {
     let err: Error, success;
     if (req && req.body) {
-      [err, success] = await to(this.expenseSevices.createCategory(req.body));
+      let value = {
+        categoryName: req.body.categoryName,
+        categoryImage: req.body.categoryImage,
+        planingAmount: req.body.planingAmount,
+        userId: req.user["id"],
+      };
+      [err, success] = await to(this.expenseSevices.createCategory(value));
     }
     if (err) return ReE(res, err, 422);
     return Reponse(res, { success: "success" }, 200);
