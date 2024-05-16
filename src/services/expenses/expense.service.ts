@@ -1,5 +1,5 @@
 // import { GlobalFunction } from "../../globalfunction";
-import sequelize from "sequelize";
+import sequelize, { Model } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models"; // Update the path to the correct location
 // import { Expenses } from '../../models/expenses'; // Update the path to the correct location
@@ -20,28 +20,36 @@ export class ExpenseSevices {
       createCategorySuccess,
       createCategoryPlanMappingErr: Error,
       createCategoryPlanMapping;
-
-    [createCategoryErr, createCategorySuccess] = await to(
-      this.categoryModel.create(data)
-    );
-    if (createCategoryErr) {
-      console.log("createCategoryErr", createCategoryErr);
-      return TE(createCategoryErr.message, true);
-    }
-    if (createCategorySuccess.dataValues.id) {
-      let value = {
-        planingAmount: data?.planingAmount,
-        userId: data.user,
-        categoryId: createCategorySuccess.dataValues.id,
-      };
-      [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
-        this.createExpensePlaning(value)
-      );
-      if (createCategoryPlanMappingErr) {
-        return TE(createCategoryPlanMappingErr.message, true);
-      }
-    }
-    return createCategorySuccess;
+      return await Model.sequelize.transaction({ autocommit: false }).then(async t => {
+        try {
+            [createCategoryErr, createCategorySuccess] = await to(
+                this.categoryModel.create(data)
+            );
+            if (createCategoryErr) {
+                console.log("createCategoryErr", createCategoryErr);
+                return TE(createCategoryErr.message, true);
+            }
+            if (createCategorySuccess.dataValues.id) {
+                let value = {
+                    planingAmount: data?.planingAmount,
+                    userId: data.user,
+                    categoryId: createCategorySuccess.dataValues.id,
+                };
+                [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
+                    this.createExpensePlaning(value)
+                );
+                if (createCategoryPlanMappingErr) {
+                    return TE(createCategoryPlanMappingErr.message, true);
+                }
+            }
+            await t.commit()
+            return createCategorySuccess;
+        } catch (err) {
+            await t.rollback();
+            return TE(err.message, true);
+        }
+    });
+    
   };
 
   getAllCategory = async (userId: number) => {
