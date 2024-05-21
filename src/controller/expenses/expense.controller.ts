@@ -68,25 +68,25 @@ export class ExpenseController {
     );
   };
 
-  createExpensePlaning = async (req: Request, res: Response) => {
-    let err: Error, success, body: planingAmount;
-    console.log(req.user);
-    if (req && req.body) {
-      body = req.body;
-      let data = {
-        planingAmount: body?.planingAmount,
-        userId: req.user["id"],
-        categoryId: body?.categoryId,
-      };
-      [err, success] = await to(this.expenseSevices.createExpensePlaning(data));
-    }
-    if (err) return ReE(res, err, 422);
-    return Reponse(
-      res,
-      { success: "Daily Expenses created successfully" },
-      200
-    );
-  };
+  // createExpensePlaning = async (req: Request, res: Response) => {
+  //   let err: Error, success, body: planingAmount;
+  //   console.log(req.user);
+  //   if (req && req.body) {
+  //     body = req.body;
+  //     let data = {
+  //       planingAmount: body?.planingAmount,
+  //       userId: req.user["id"],
+  //       categoryId: body?.categoryId,
+  //     };
+  //     [err, success] = await to(this.expenseSevices.createExpensePlaning(data));
+  //   }
+  //   if (err) return ReE(res, err, 422);
+  //   return Reponse(
+  //     res,
+  //     { success: "Daily Expenses created successfully" },
+  //     200
+  //   );
+  // };
 
   getAllExpenses = async (req: Request, res: Response) => {
     let err: Error, success;
@@ -118,11 +118,11 @@ export class ExpenseController {
       passport.authenticate("jwt", { session: false }),
       this.getAllExpenses
     );
-    this.router.post(
-      "/planing",
-      passport.authenticate("jwt", { session: false }),
-      this.createExpensePlaning
-    );
+    // this.router.post(
+    //   "/planing",
+    //   passport.authenticate("jwt", { session: false }),
+    //   this.createExpensePlaning
+    // );
     this.router.post(
       "/daily/expenses",
       passport.authenticate("jwt", { session: false }),

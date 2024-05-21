@@ -1,12 +1,12 @@
 // import { GlobalFunction } from "../../globalfunction";
-import sequelize, { Model } from "sequelize";
+import sequelize, { Model, Transaction } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models"; // Update the path to the correct location
 // import { Expenses } from '../../models/expenses'; // Update the path to the correct location
 // const { Category } = require('./models');
 // import { Category } from '../../models' as any;
-import { Op, where } from "sequelize";
-
+import { Op } from "sequelize";
+import { createCategoryInter, createExpensePlaningInter } from '../../Module/expenses/expense.interface'
 export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
   expensesModel: any = dbInstance.expenses;
@@ -15,41 +15,53 @@ export class ExpenseSevices {
   // constructor(){
 
   // }
-  createCategory = async (data) => {
+  createCategory = async (data: createCategoryInter) => {
     let createCategoryErr: Error,
       createCategorySuccess,
       createCategoryPlanMappingErr: Error,
       createCategoryPlanMapping;
-      return await Model.sequelize.transaction({ autocommit: false }).then(async t => {
-        try {
-            [createCategoryErr, createCategorySuccess] = await to(
-                this.categoryModel.create(data)
-            );
-            if (createCategoryErr) {
-                console.log("createCategoryErr", createCategoryErr);
-                return TE(createCategoryErr.message, true);
-            }
-            if (createCategorySuccess.dataValues.id) {
-                let value = {
-                    planingAmount: data?.planingAmount,
-                    userId: data.user,
-                    categoryId: createCategorySuccess.dataValues.id,
-                };
-                [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
-                    this.createExpensePlaning(value)
-                );
-                if (createCategoryPlanMappingErr) {
-                    return TE(createCategoryPlanMappingErr.message, true);
-                }
-            }
-            await t.commit()
-            return createCategorySuccess;
-        } catch (err) {
-            await t.rollback();
-            return TE(err.message, true);
+    // return await Model.sequelize.transaction({ autocommit: false }).then(async t => {
+    const transaction = await Model.sequelize.transaction({ autocommit: false });
+
+    try {
+      [createCategoryErr, createCategorySuccess] = await to(
+        this.categoryModel.create(data, { transaction: transaction })
+      );
+      if (createCategoryErr) {
+        console.log("createCategoryErr", createCategoryErr);
+        return TE(createCategoryErr.message, true);
+      }
+      if (createCategorySuccess.dataValues.id) {
+        let value = {
+          planingAmount: data?.planingAmount,
+          userId: data.userId,
+          categoryId: createCategorySuccess.dataValues.id,
+        };
+        [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
+          this.createExpensePlaning(value, transaction)
+        );
+        if (createCategoryPlanMappingErr) {
+          return TE(createCategoryPlanMappingErr.message, true);
         }
-    });
-    
+      }
+      await transaction.commit()
+      return createCategorySuccess;
+    } catch (err) {
+      await transaction.rollback();
+      return TE(err.message, true);
+    }
+    // });
+
+  };
+
+  createExpensePlaning = async function (data:createExpensePlaningInter,transaction:Transaction) {
+    let createExpensePlaningErr:Error, createExpensePlaningSuccess;
+    [createExpensePlaningErr, createExpensePlaningSuccess] = await to(
+      this.categoryPlaningAmount.create(data,{ transaction: transaction })
+    );
+    if (createExpensePlaningErr)
+      return TE(createExpensePlaningErr.message, true);
+    return createExpensePlaningSuccess;
   };
 
   getAllCategory = async (userId: number) => {
@@ -78,15 +90,9 @@ export class ExpenseSevices {
     }
     return createCategorySuccess;
   };
-  createExpensePlaning = async function (data) {
-    let createExpensePlaningErr, createExpensePlaningSuccess;
-    [createExpensePlaningErr, createExpensePlaningSuccess] = await to(
-      this.categoryPlaningAmount.create(data)
-    );
-    if (createExpensePlaningErr)
-      return TE(createExpensePlaningErr.message, true);
-    return createExpensePlaningSuccess;
-  };
+
+
+
   getAllExpenses = async (userId: number) => {
     let getExpensesErr: Error, getExpensesSuccess;
 

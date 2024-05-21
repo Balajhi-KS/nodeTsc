@@ -8,4 +8,15 @@ interface planingAmount {
   planingAmount: number;
   categoryId: number;
 }
-export { createExpense, planingAmount };
+interface createCategoryInter{
+  categoryName:string;
+  categoryImage:string;
+  planingAmount:string;
+  userId:number;
+}
+interface createExpensePlaningInter{
+  planingAmount:string;
+  categoryId:string;
+  userId:number;
+}
+export { createExpense, planingAmount, createCategoryInter, createExpensePlaningInter };
