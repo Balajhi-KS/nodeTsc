@@ -7,7 +7,7 @@ import express, {
 } from "express";
 import { UserSevices } from "../../services/user/user.service";
 import { ReE, Reponse, TE, to } from "../../globalfunction";
-import { CheckUserIdAlreadyExist } from "../../Module/User/user.interface";
+import { CheckUserIdAlreadyExist } from "../../Module";
 
 export class User {
   private router: express.Router;

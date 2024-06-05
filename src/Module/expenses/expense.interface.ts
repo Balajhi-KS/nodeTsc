@@ -19,4 +19,11 @@ interface createExpensePlaningInter{
   categoryId:string;
   userId:number;
 }
-export { createExpense, planingAmount, createCategoryInter, createExpensePlaningInter };
+interface createCategoryMappingTnter {
+  dataValues: {
+    id: number;
+    categoryName: string;
+    categoryImage: string;
+  };
+}
+export { createExpense, planingAmount, createCategoryInter, createExpensePlaningInter,createCategoryMappingTnter };

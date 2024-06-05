@@ -4,17 +4,20 @@ import {
   CheckUserIdAlreadyExist,
   name,
   user,
-} from "../../Module/User/user.interface";
+} from "../../Module";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { CommonSevices } from "../commonService/common.service";
+import { ExpenseSevices } from "../expenses/expense.service";
 export class UserSevices {
   userModel: any = dbInstance.user;
   userLoginDetailsModel: any = dbInstance.userLoginDetails;
   public commonSevices: CommonSevices;
-
+  public expenseSevices:ExpenseSevices
+  
   constructor() {
     this.commonSevices = new CommonSevices();
+    this.expenseSevices = new ExpenseSevices();
   }
   /**
    * Create New user
@@ -44,6 +47,9 @@ export class UserSevices {
 
     [userErr, user] = await to(this.userModel.create(data));
     if (userErr) return userErr;
+    if(user){
+      this.expenseSevices.createCategoryMapping(user);
+    }
     return user;
   };
 

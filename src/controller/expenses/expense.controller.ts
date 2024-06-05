@@ -8,7 +8,7 @@ import { ExpenseSevices } from "../../services/expenses/expense.service";
 import {
   createExpense,
   planingAmount,
-} from "../../Module/expenses/expense.interface";
+} from "../../Module";
 
 export class ExpenseController {
   private router: express.Router;
@@ -68,25 +68,27 @@ export class ExpenseController {
     );
   };
 
-  // createExpensePlaning = async (req: Request, res: Response) => {
-  //   let err: Error, success, body: planingAmount;
-  //   console.log(req.user);
-  //   if (req && req.body) {
-  //     body = req.body;
-  //     let data = {
-  //       planingAmount: body?.planingAmount,
-  //       userId: req.user["id"],
-  //       categoryId: body?.categoryId,
-  //     };
-  //     [err, success] = await to(this.expenseSevices.createExpensePlaning(data));
-  //   }
-  //   if (err) return ReE(res, err, 422);
-  //   return Reponse(
-  //     res,
-  //     { success: "Daily Expenses created successfully" },
-  //     200
-  //   );
-  // };
+  createExpensePlaning = async (req: Request, res: Response) => {
+    let err: Error, success, body: planingAmount;
+    console.log(req.body);
+    if (req && req.body ) {
+      body = req.body;
+      let data = {
+        planingAmount: body?.planingAmount,
+        userId: req.user["id"],
+        categoryId: body?.categoryId,
+      };
+      [err, success] = await to(this.expenseSevices.createExpensePlaning(data));
+
+      if (err) return ReE(res, err, 422);
+      return Reponse(
+        res,
+        { success: "Daily Expenses created successfully" },
+        200
+      );
+    }
+    return ReE(res,'Missing Body Data',422)
+  };
 
   getAllExpenses = async (req: Request, res: Response) => {
     let err: Error, success;
@@ -101,6 +103,7 @@ export class ExpenseController {
 
   get routes() {
     this.app.use("/", this.router);
+
     this.router
       .route("/category")
       .post(
@@ -113,16 +116,21 @@ export class ExpenseController {
         passport.authenticate("jwt", { session: false }),
         this.getAllCategory
       );
+
     this.router.get(
       "/expense",
       passport.authenticate("jwt", { session: false }),
       this.getAllExpenses
     );
-    // this.router.post(
-    //   "/planing",
-    //   passport.authenticate("jwt", { session: false }),
-    //   this.createExpensePlaning
-    // );
+
+    this.router.post(
+      "/planing",
+      expenseValidator.createPlanningAmount,
+      validate,
+      passport.authenticate("jwt", { session: false }),
+      this.createExpensePlaning
+    );
+    
     this.router.post(
       "/daily/expenses",
       passport.authenticate("jwt", { session: false }),
