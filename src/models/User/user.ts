@@ -49,17 +49,20 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
           "password",
         ],
       });
-      this.checkPassword = user?.dataValues?.password;
-      this.salt = this.checkPassword.slice(0, 16);
-      if (user && this.checkPassword && this.salt) {
-        let hash: any;
-        hash = crypto.createHash("sha256");
-        hash.update(password + this.salt);
-        if (this.checkPassword === this.salt + hash.digest("hex")) {
-          delete user?.dataValues?.password;
-          return user?.dataValues;
+      if (user) {
+        this.checkPassword = user?.dataValues?.password;
+        this.salt = this.checkPassword.slice(0, 16);
+        if (this.checkPassword && this.salt) {
+          let hash: any;
+          hash = crypto.createHash("sha256");
+          hash.update(password + this.salt);
+          if (this.checkPassword === this.salt + hash.digest("hex")) {
+            delete user?.dataValues?.password;
+            return user?.dataValues;
+          }
         }
       }
+
       return null;
     };
   }

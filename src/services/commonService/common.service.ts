@@ -64,17 +64,55 @@ export class CommonSevices {
    */
 
   generateRSAKeys = () => {
-    const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+    const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa-pss", {
       modulusLength: 2048,
       publicKeyEncoding: {
-        type: "pkcs1",
+        type: "spki",
         format: "pem",
       },
       privateKeyEncoding: {
-        type: "pkcs1",
+        type: "pkcs8",
         format: "pem",
       },
     });
+    const data = "Important message";
+
+    // Create the signer object
+    const signer = crypto.createSign("sha256");
+
+    // Add data to be signed
+    signer.update(data);
+    signer.end();
+
+    // Sign the data with RSA-PSS padding
+    const signature = signer.sign({
+      key: privateKey,
+      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+      saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST,
+    });
+
+    console.log("Signature:", signature.toString("base64"));
+
+    const signatureBase64 = signature.toString("base64"); // Use the generated signature
+
+    // Create the verifier object
+    const verifier = crypto.createVerify("sha256");
+
+    // Add data to be verified
+    verifier.update(data);
+    verifier.end();
+
+    // Verify the signature with RSA-PSS padding
+    const isVerified = verifier.verify(
+      {
+        key: publicKey,
+        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+        saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST,
+      },
+      Buffer.from(signatureBase64, "base64")
+    );
+
+    console.log("Verified:", isVerified);
     return { privateKey, publicKey };
   };
 }
