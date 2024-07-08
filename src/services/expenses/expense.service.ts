@@ -107,7 +107,7 @@ export class ExpenseSevices {
           "id",
           "categoryName",
           "categoryImage",
-          [sequelize.fn("sum", sequelize.col("spend")), "total_amount"],
+          [sequelize.fn("sum", sequelize.col("spend")), "totalAmount"],
         ],
         include: [
           {

@@ -1,11 +1,8 @@
 // var express = require('express');
 import express, {
-  Application,
   Request,
   Response,
-  NextFunction,
-  Router,
-  Express,
+  NextFunction
 } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -18,7 +15,6 @@ import helmet from "helmet";
 import { passport } from "./middleware/passport";
 import { UserVerify } from "./middleware/userVerify";
 import logger from "morgan";
-import jsonwebtoken from "jsonwebtoken";
 
 dotenv.config();
 class App {
