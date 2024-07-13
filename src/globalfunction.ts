@@ -3,15 +3,15 @@ import * as zlib from "zlib";
 const to = function (promise: any) {
   //global function that will help use handle promise rejections, this article talks about it http://blog.grossman.io/how-to-write-async-await-without-try-catch-blocks-in-javascript/
   return promise
-    .then((data) => {
+    .then((data:string) => {
       return [null, data];
     })
-    .catch((err) => {
+    .catch((err:Error) => {
       console.log(err);
       return [err, null];
     });
 };
-const TE = function (err_message, log) {
+const TE = function (err_message:string, log:boolean) {
   if (log === true) {
     console.error(err_message);
   }
@@ -29,7 +29,7 @@ const ReE = function (res: any, err: any, code: number) {
   return res.json({ success: false, error: err });
 };
 
-const Reponse = function (res, data, code) {
+const Reponse = function (res:any, data:object | string, code:number) {
   let send_data = data;
   if (typeof data == "object") {
     send_data = Object.assign(data, send_data); //merge the objects

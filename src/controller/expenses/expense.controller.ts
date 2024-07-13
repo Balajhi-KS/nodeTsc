@@ -8,6 +8,7 @@ import { ExpenseSevices } from "../../services/expenses/expense.service";
 import {
   createExpense,
   planingAmount,
+  UserRequestToken,
 } from "../../Module";
 
 export class ExpenseController {
@@ -21,34 +22,48 @@ export class ExpenseController {
     this.expenseSevices = new ExpenseSevices();
   }
 
-  createCategorys = async (req: Request, res: Response) => {
-    let err: Error, success;
+  createCategorys = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+
     if (req && req.body) {
-      let value = {
+
+      const value = {
         categoryName: req.body.categoryName,
         categoryImage: req.body.categoryImage,
         planingAmount: req.body.planingAmount,
-        userId: req.user["id"],
+        userId: req.user.id,
       };
+
       [err, success] = await to(this.expenseSevices.createCategory(value));
+
     }
+
     if (err) return ReE(res, err, 422);
+
     return Reponse(res, { success: "success" }, 200);
+
   };
 
-  getAllCategory = async (req: Request, res: Response) => {
-    let err: Error, success;
+
+
+  getAllCategory = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+
     if (req) {
+
       [err, success] = await to(
-        this.expenseSevices.getAllCategory(req.user["id"])
+        this.expenseSevices.getAllCategory(req.user.id)
       );
+
     }
+
     if (err) return ReE(res, err, 422);
+
     return Reponse(res, { success: success }, 200);
   };
 
-  createDailyExpenses = async (req: Request, res: Response) => {
-    let err: Error, success, body: createExpense;
+  createDailyExpenses = async (req: any, res: Response) => {
+    let err: Error | null = null, success, body: createExpense;
     if (req && req.body) {
       body = req.body;
       let data = {
@@ -68,10 +83,10 @@ export class ExpenseController {
     );
   };
 
-  createExpensePlaning = async (req: Request, res: Response) => {
-    let err: Error, success, body: planingAmount;
+  createExpensePlaning = async (req: any, res: Response) => {
+    let err: Error | null = null, success, body: planingAmount;
     console.log(req.body);
-    if (req && req.body ) {
+    if (req && req.body) {
       body = req.body;
       let data = {
         planingAmount: body?.planingAmount,
@@ -87,14 +102,15 @@ export class ExpenseController {
         200
       );
     }
-    return ReE(res,'Missing Body Data',422)
+    return ReE(res, 'Missing Body Data', 422)
   };
 
-  getAllExpenses = async (req: Request, res: Response) => {
-    let err: Error, success;
-    if (req) {
+  getAllExpenses = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+    if (req && req?.user) {
+
       [err, success] = await to(
-        this.expenseSevices.getAllExpenses(req.user["id"])
+        this.expenseSevices.getAllExpenses(req.user.id)
       );
     }
     if (err) return ReE(res, err, 422);
@@ -130,7 +146,7 @@ export class ExpenseController {
       passport.authenticate("jwt", { session: false }),
       this.createExpensePlaning
     );
-    
+
     this.router.post(
       "/daily/expenses",
       passport.authenticate("jwt", { session: false }),

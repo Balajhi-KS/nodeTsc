@@ -1,6 +1,7 @@
+import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-// export class Validate{
-const validate = (req, res, next) => {
+
+const validate = (req:Request, res:Response, next:NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -9,5 +10,4 @@ const validate = (req, res, next) => {
   }
   next();
 };
-// }
 export { validate };

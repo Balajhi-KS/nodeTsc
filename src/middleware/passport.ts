@@ -1,16 +1,21 @@
-import { Strategy, ExtractJwt } from "passport-jwt";
+import { Strategy, ExtractJwt,StrategyOptions, VerifiedCallback } from "passport-jwt";
 import passport from "passport";
 
 const JwtStrategy = Strategy;
-
-const jwtOptions = {
+interface JwtPayload {
+  sub: string;
+  name: string;
+  iat?: number;
+  exp?: number;
+}
+const jwtOptions:StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.SECRETKEY,
+  secretOrKey: process.env.SECRETKEY as string,
 };
 
 // Usage example for the JwtStrategy
 passport.use(
-  new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
+  new JwtStrategy(jwtOptions, async (jwtPayload:JwtPayload, done:VerifiedCallback) => {
     if (jwtPayload) {
       return done(null, jwtPayload);
     } else {

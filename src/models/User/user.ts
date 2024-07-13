@@ -1,6 +1,6 @@
 "use strict";
 
-import { Model, DataTypes, Sequelize } from "sequelize";
+import { Model,Sequelize } from "sequelize";
 import crypto from "crypto";
 
 interface UserAttributes {
@@ -10,9 +10,9 @@ interface UserAttributes {
   userId: string;
   email: string;
   phone: number;
-  password: string;
   created: Date;
   modified: Date;
+  password?: string;
 }
 
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
@@ -27,16 +27,16 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public created!: Date;
     public modified!: Date;
 
-    public username!: string;
-    public checkPassword!: string;
-    public salt!: string;
+    // public username!: string;
+    // public checkPassword!: string;
+    // public salt!: string;
     static associate(models: any) {
       User.hasMany(models.userLoginDetails, { foreignKey: "userId" });
     }
-    static authenticate = async function (
+    static authenticate = async (
       email: string,
       password: string
-    ): Promise<User | null> {
+    ): Promise<User | null> => {
       const user = await this.findOne({
         where: { email },
         attributes: [
@@ -49,16 +49,15 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
           "password",
         ],
       });
-      if (user) {
-        this.checkPassword = user?.dataValues?.password;
-        this.salt = this.checkPassword.slice(0, 16);
-        if (this.checkPassword && this.salt) {
+      if (user && user.dataValues?.password) {
+        const salt = user?.dataValues?.password.slice(0, 16);
+        if (user?.dataValues?.password && salt) {
           let hash: any;
           hash = crypto.createHash("sha256");
-          hash.update(password + this.salt);
-          if (this.checkPassword === this.salt + hash.digest("hex")) {
+          hash.update(password + salt);
+          if (user?.dataValues?.password === salt + hash.digest("hex")) {
             delete user?.dataValues?.password;
-            return user?.dataValues;
+            return user;
           }
         }
       }

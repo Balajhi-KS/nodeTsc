@@ -28,7 +28,7 @@ export class User {
    * @returns success message
    */
   registerUser = async (req: Request, res: Response) => {
-    let err: Error, success: CheckUserIdAlreadyExist;
+    let err: Error | null = null, success: CheckUserIdAlreadyExist;
 
     if (req && req.body) {
       [err, success] = await to(this.UserSevices.registerUser(req.body));

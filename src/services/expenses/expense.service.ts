@@ -43,7 +43,7 @@ export class ExpenseSevices {
       }
       await transaction.commit()
       return createCategorySuccess;
-    } catch (err) {
+    } catch (err:any) {
       await transaction.rollback();
       return TE(err.message, true);
     }
@@ -51,7 +51,7 @@ export class ExpenseSevices {
 
   };
 
-  createExpensePlaning = async function (data: createExpensePlaningInter | planingAmount, transaction?: Transaction) {
+  createExpensePlaning = async (data: createExpensePlaningInter | planingAmount, transaction?: Transaction) =>{
     let createExpensePlaningErr: Error, createExpensePlaningSuccess;
 
     [createExpensePlaningErr, createExpensePlaningSuccess] = await to(
@@ -80,7 +80,7 @@ export class ExpenseSevices {
     return getAllCategorySuccess;
   };
 
-  createDailyExpenses = async (data) => {
+  createDailyExpenses = async (data:any) => {
     let createCategoryErr: Error, createCategorySuccess;
 
     [createCategoryErr, createCategorySuccess] = await to(

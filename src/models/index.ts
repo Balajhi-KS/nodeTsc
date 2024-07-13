@@ -32,10 +32,11 @@ const sequelize = new Sequelize({
   },
 });
 const schemaCreate = async function () {
-  // const test = [];
+
+  
   var schemas = await sequelize.showAllSchemas({}).then(
-    (s) => {
-      CONSTANT.SCHEMAS.forEach(async (item) => {
+    (s:any) => {
+      (CONSTANT.SCHEMAS as string[]).forEach(async (item:string) => {
         if (s.indexOf(item) < 0) {
           await sequelize.createSchema(item, {});
         }
@@ -48,7 +49,7 @@ const schemaCreate = async function () {
   return schemas;
 };
 
-CONSTANT.SCHEMAS.forEach((item) => {
+CONSTANT.SCHEMAS.forEach((item:string) => {
   fs.readdirSync(path.join(__dirname, item))
     .filter((file) => {
       return (

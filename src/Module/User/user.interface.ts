@@ -1,3 +1,6 @@
+import { Request } from "express";
+
+
 interface user {
   firstName: string;
   lastName: string;
@@ -27,4 +30,13 @@ interface CheckUserIdAlreadyExist {
   dataValues: UserModelAttributes;
 }
 
-export { user, name, CheckUserIdAlreadyExist };
+interface UserDetails {
+  userName: string,
+  password: string
+}
+
+interface UserRequestToken {
+  user: {id?: number};
+  body :any
+}
+export { user, name, CheckUserIdAlreadyExist,UserDetails ,UserRequestToken};

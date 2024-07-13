@@ -36,7 +36,7 @@ class App {
     this.express.use(logger("dev"));
     this.express.use(bodyParser.json({ limit: "10mb" }));
     this.express.use(bodyParser.urlencoded({ extended: true }));
-    this.express.use((req: Request, res: Response, next: NextFunction) => {
+    this.express.use((req: any, res: Response, next: NextFunction) => {
       console.log(this.userVerify, "this.userVerify");
       if (req && req.headers && req.headers.authorization) {
         const token = this.userVerify.checkUseToken(req.headers.authorization);
@@ -79,7 +79,7 @@ class App {
         );
       });
     const host: string = "localhost";
-    const port: number = +process.env.PORT;
+    const port: number = +(process.env.PORT as string);
     this.express.listen(3000, host, () => {
       console.log(`Listening to ${port} ${host}`);
     });

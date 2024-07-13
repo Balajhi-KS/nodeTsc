@@ -4,6 +4,7 @@ import {
   CheckUserIdAlreadyExist,
   name,
   user,
+  UserDetails,
 } from "../../Module";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -59,10 +60,10 @@ export class UserSevices {
    * @param res
    */
   createRandomUserId = async (name: name) => {
-    let randomUserId: string;
+    let randomUserId: string | null = null;
     let checkUserIdAleadyExistErr: Error,
       checkUserIdAleadyExist: CheckUserIdAlreadyExist | null;
-    let i: number;
+    let i: number | null = null;
     while (i != 0) {
       randomUserId = (
         name.firstName +
@@ -97,7 +98,7 @@ export class UserSevices {
     return checkUserIdAleadyExist;
   };
 
-  loginUser = async (body) => {
+  loginUser = async (body:UserDetails) => {
     const authenticatedUser = await this.userModel.authenticate(
       body.userName,
       body.password
@@ -126,7 +127,7 @@ export class UserSevices {
       };
       let jwtToken =
         "Bearer " +
-        jwt.sign(clonedObject, process.env.SECRETKEY, {
+        jwt.sign(clonedObject, (process.env.SECRETKEY as string), {
           expiresIn: expiration_time,
         });
 
