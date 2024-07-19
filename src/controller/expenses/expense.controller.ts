@@ -6,7 +6,9 @@ import { validate } from "../../middleware/validate-schema";
 import { expenseValidator } from "../../validator/experess.validator";
 import { ExpenseSevices } from "../../services/expenses/expense.service";
 import {
+  createCategoryInter,
   createExpense,
+  createExpensePlaningInter,
   planingAmount,
   UserRequestToken,
 } from "../../Module";
@@ -35,6 +37,34 @@ export class ExpenseController {
       };
 
       [err, success] = await to(this.expenseSevices.createCategory(value));
+
+    }
+
+    if (err) return ReE(res, err, 422);
+
+    return Reponse(res, { success: "success" }, 200);
+
+  };
+
+
+  updateCategory = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+
+    if (req && req.body) {
+      
+      const value = { 
+        userId: req.user.id, 
+        id: req.body.id 
+      } as createExpensePlaningInter;
+      console.log(req.body,'valllll');
+      
+      if(req.body.categoryName) value['categoryName'] = req.body.categoryName;
+      if(req.body.categoryImage) value['categoryImage'] = req.body.categoryImage;
+      if(req.body.planingAmount) value['planingAmount'] = req.body.planingAmount;
+
+      console.log(value,'valllll');
+       
+      [err, success] = await to(this.expenseSevices.updateCategory(value));
 
     }
 
@@ -131,6 +161,10 @@ export class ExpenseController {
       .get(
         passport.authenticate("jwt", { session: false }),
         this.getAllCategory
+      )
+      .put(
+        passport.authenticate("jwt", { session: false }),
+        this.updateCategory
       );
 
     this.router.get(
