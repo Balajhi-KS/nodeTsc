@@ -56,13 +56,10 @@ export class ExpenseController {
         userId: req.user.id, 
         id: req.body.id 
       } as createExpensePlaningInter;
-      console.log(req.body,'valllll');
       
       if(req.body.categoryName) value['categoryName'] = req.body.categoryName;
       if(req.body.categoryImage) value['categoryImage'] = req.body.categoryImage;
       if(req.body.planingAmount) value['planingAmount'] = req.body.planingAmount;
-
-      console.log(value,'valllll');
        
       [err, success] = await to(this.expenseSevices.updateCategory(value));
 

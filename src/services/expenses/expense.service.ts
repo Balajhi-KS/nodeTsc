@@ -25,7 +25,6 @@ export class ExpenseSevices {
         this.categoryModel.create(data, { transaction: transaction })
       );
       if (createCategoryErr) {
-        console.log("createCategoryErr", createCategoryErr);
         return TE(createCategoryErr.message, true);
       }
       if (createCategorySuccess.dataValues.id) {
@@ -94,7 +93,6 @@ export class ExpenseSevices {
       }
 
       if (data.hasOwnProperty('planingAmount') && data?.id) {
-        console.log(data, 'daaaaaaa');
 
         [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
           this.updateExpensePlaning({
@@ -103,7 +101,6 @@ export class ExpenseSevices {
             userId: data.userId
           }, transaction)
         );
-        console.log(createCategoryPlanMapping);
 
         if (createCategoryPlanMappingErr) {
           return TE(createCategoryPlanMappingErr.message, true);
@@ -138,7 +135,6 @@ export class ExpenseSevices {
         }, transaction
       })
     );
-    console.log(createExpensePlaningSuccess,'gjhgjhgjh');
 
     createExpensePlaningSuccess[0].set({
       planingAmount: data.planingAmount,
@@ -158,8 +154,8 @@ export class ExpenseSevices {
       this.categoryModel.findAll({
         where: { [Op.or]: [{ userId: userId }, { userId: null }] },
         attributes: ['id',
-          ['category_name', 'categoryName'],
-          ['category_image', 'categoryImage'],
+          'categoryName',
+          'categoryImage',
           [
             sequelize.literal(`(
             SELECT "planing_amount"
@@ -187,7 +183,6 @@ export class ExpenseSevices {
     );
 
     if (createCategoryErr) {
-      console.log("createCategoryErr", createCategoryErr);
       return TE(createCategoryErr.message, true);
     }
 
@@ -235,7 +230,6 @@ export class ExpenseSevices {
     );
 
     if (getExpensesErr) {
-      console.log("getExpensesErr", getExpensesErr);
       return TE(getExpensesErr.message, true);
     }
     return getExpensesSuccess;
