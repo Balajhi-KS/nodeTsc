@@ -144,6 +144,20 @@ export class ExpenseController {
     return Reponse(res, { success: success }, 200);
   };
 
+
+
+  getSpendByCategory = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+    if (req && req?.user) {
+
+      [err, success] = await to(
+        this.expenseSevices.getSpendByCategory(req.user.id)
+      );
+    }
+    if (err) return ReE(res, err, 422);
+    return Reponse(res, { success: success }, 200);
+  };
+
   get routes() {
     this.app.use("/", this.router);
 
@@ -165,7 +179,7 @@ export class ExpenseController {
       );
 
     this.router.get(
-      "/expense",
+      "/all",
       passport.authenticate("jwt", { session: false }),
       this.getAllExpenses
     );
@@ -183,6 +197,12 @@ export class ExpenseController {
       passport.authenticate("jwt", { session: false }),
       this.createDailyExpenses
     );
+
+    
+    this.router.get("/spendByCategory",
+      passport.authenticate("jwt", { session: false }),
+      this.getSpendByCategory);
+
     return this.router;
   }
 }

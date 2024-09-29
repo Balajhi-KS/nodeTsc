@@ -132,10 +132,13 @@ export class UserSevices {
         });
 
       return {
-        encryptionKey: keyPair.publicKey,
-        token: this.commonSevices.encryptDetails(
-          JSON.stringify({ jwtToken: jwtToken, id: token })
-        ),
+        data: {
+          encryptionKey: keyPair.publicKey,
+          token: this.commonSevices.encryptDetails(
+            JSON.stringify({ jwtToken: jwtToken, id: token })
+          ),
+          UserDetails: clonedObject
+        }
       };
     }
     return null;

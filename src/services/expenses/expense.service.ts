@@ -1,7 +1,7 @@
-import sequelize, { Sequelize, Transaction, where } from "sequelize";
+import sequelize, {  Sequelize, Transaction } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models";
-import { Op } from "sequelize";
+import { Op,col, fn } from "sequelize";
 import { categoryCondition, CheckUserIdAlreadyExist, createCategoryInter, createCategoryMappingTnter, createExpensePlaningInter, planingAmount } from "../../Module";
 export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
@@ -194,40 +194,60 @@ export class ExpenseSevices {
   getAllExpenses = async (userId: number) => {
     let getExpensesErr: Error, getExpensesSuccess;
 
-    [getExpensesErr, getExpensesSuccess] = await to(
-      this.categoryModel.findAll({
-        where: { [Op.or]: [{ userId: userId }, { userId: null }] },
-        attributes: [
-          "id",
-          "categoryName",
-          "categoryImage",
-          [sequelize.fn("sum", sequelize.col("spend")), "totalAmount"],
-        ],
-        include: [
-          {
-            required: false,
-            model: this.expensesModel,
-            attributes: ["id", "spend", "balance", "reason"],
-          },
-          {
-            model: this.categoryPlaningAmount,
-            required: false,
-            where: { userId: userId },
-            attributes: ["id", "planingAmount"],
-          },
-        ],
-        group: [
-          "Category.id",
-          "CategoryPlans.id",
-          "Category.category_name",
-          "Category.category_image",
-          "Expenses.id",
-          "Expenses.spend",
-          "Expenses.balance",
-          "Expenses.reason",
-        ],
-      })
-    );
+      [getExpensesErr, getExpensesSuccess] = await to(
+        this.expensesModel.findAll({
+          where:{[Op.or]:[{userId:userId}]},
+          attributes:[
+            'id',
+            'spend',
+            'reason',
+            'created',
+            'categoryId'
+          ],
+          order: [['created', 'DESC']],
+          include: [
+            {
+              required: false,
+              model: this.categoryModel,
+              attributes: ["id", "categoryName", "categoryImage"],
+            },
+          ]
+        })
+      )
+    // [getExpensesErr, getExpensesSuccess] = await to(
+    //   this.categoryModel.findAll({
+    //     where: { [Op.or]: [{ userId: userId }, { userId: null }] },
+    //     attributes: [
+    //       "id",
+    //       "categoryName",
+    //       "categoryImage",
+    //       [sequelize.fn("sum", sequelize.col("spend")), "totalAmount"],
+    //     ],
+    //     include: [
+    //       {
+    //         required: false,
+    //         model: this.expensesModel,
+    //         attributes: ["id", "spend", "balance", "reason"],
+    //       },
+    //       {
+    //         model: this.categoryPlaningAmount,
+    //         required: false,
+    //         where: { userId: userId },
+    //         attributes: ["id", "planingAmount"],
+    //       },
+    //     ],
+    //     group: [
+    //       "Category.id",
+    //       "CategoryPlans.id",
+    //       "Category.category_name",
+    //       "Category.category_image",
+    //       "Expenses.id",
+    //       "Expenses.spend",
+    //       "Expenses.balance",
+    //       "Expenses.reason",
+    //     ],
+    //   })
+    // );
 
     if (getExpensesErr) {
       return TE(getExpensesErr.message, true);
@@ -269,5 +289,32 @@ export class ExpenseSevices {
     [addNewCreateCategoryErr, addNewCreateCategorySuccess] = await to(this.categoryModel.bulkCreate(createNewMapping));
 
     return createCategoryMappingSuccess;
+  }
+
+
+  getSpendByCategory = async (userId: number) => {
+    let getAllSpendErr, getAllSpendSuccess;
+
+    [getAllSpendErr, getAllSpendSuccess] = await to(
+      this.categoryModel.findAll({
+        where: { [Op.or]: [{ userId: userId }, { userId: null }] },
+        attributes: [
+          'id', 
+          'categoryName',
+          [fn('COALESCE', fn('SUM', col('Expenses.spend')), 0), 'totalSpend']    // Sum the spend for each category
+        ],
+        include: [{
+          model: this.expensesModel,
+          attributes: []  // No need to return individual expenses, just the total
+        }],
+        group: ['Category.id'],  // Group by category to calculate total per category
+        raw: true  // Fetch plain objects instead of Sequelize instances
+      })
+    );
+
+      if(getAllSpendErr) return getAllSpendErr;
+
+
+      return getAllSpendSuccess;
   }
 }
