@@ -94,9 +94,8 @@ export class ExpenseController {
     if (req && req.body) {
       body = req.body;
       let data = {
-        spend: body?.Spend,
-        balance: body?.Balance,
-        reason: body?.Reason,
+        spend: body?.spendAmount,
+        reason: body?.reason,
         userId: req.user["id"],
         categoryId: body?.categoryId,
       };

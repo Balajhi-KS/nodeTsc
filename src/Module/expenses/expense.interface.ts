@@ -1,9 +1,9 @@
 import { Transaction } from "sequelize";
 
 interface createExpense {
-  Spend: number;
+  spendAmount: number;
   Balance: number;
-  Reason: string;
+  reason: string;
   categoryId: number;
 }
 interface planingAmount {

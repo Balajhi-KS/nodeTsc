@@ -45,7 +45,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       },
       balance: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       reason: {
         type: DataTypes.STRING,
