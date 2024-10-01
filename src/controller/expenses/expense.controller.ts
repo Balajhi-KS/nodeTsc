@@ -109,6 +109,29 @@ export class ExpenseController {
     );
   };
 
+
+
+  EditDailyExpenses = async (req: any, res: Response) => {
+    let err: Error | null = null, success, body: createExpense;
+    if (req && req.body) {
+      body = req.body;
+      let data = {
+        spend: body?.spendAmount,
+        reason: body?.reason,
+        userId: req.user["id"],
+        categoryId: body?.categoryId,
+        id:body?.id
+      };
+      [err, success] = await to(this.expenseSevices.EditDailyExpenses(data));
+    }
+    if (err) return ReE(res, err, 422);
+    return Reponse(
+      res,
+      { success: "Daily Expenses created successfully" },
+      200
+    );
+  };
+
   createExpensePlaning = async (req: any, res: Response) => {
     let err: Error | null = null, success, body: planingAmount;
     console.log(req.body);
@@ -195,6 +218,12 @@ export class ExpenseController {
       "/daily/expenses",
       passport.authenticate("jwt", { session: false }),
       this.createDailyExpenses
+    );
+
+    this.router.put(
+      "/daily/expenses",
+      passport.authenticate("jwt", { session: false }),
+      this.EditDailyExpenses
     );
 
     

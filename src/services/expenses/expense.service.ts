@@ -1,4 +1,4 @@
-import sequelize, {  Sequelize, Transaction } from "sequelize";
+import sequelize, {  Sequelize, Transaction, where } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models";
 import { Op,col, fn } from "sequelize";
@@ -187,6 +187,25 @@ export class ExpenseSevices {
     }
 
     return createCategorySuccess;
+  };
+
+
+  EditDailyExpenses = async (data: any) => {
+    let editDailyExpensesErr: Error, EditDailyExpensesSuccess;
+
+    [editDailyExpensesErr, EditDailyExpensesSuccess] = await to(
+      this.expensesModel.update(data,{
+        where:{
+          id:data.id
+        }}
+      )
+    );
+
+    if (editDailyExpensesErr) {
+      return TE(editDailyExpensesErr.message, true);
+    }
+
+    return EditDailyExpensesSuccess;
   };
 
 
