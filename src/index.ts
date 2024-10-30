@@ -80,7 +80,7 @@ class App {
       });
     const host: string = "localhost";
     const port: number = +(process.env.PORT as string);
-    this.express.listen(3000, host, () => {
+    this.express.listen(3000, () => {
       console.log(`Listening to ${port} ${host}`);
     });
   }

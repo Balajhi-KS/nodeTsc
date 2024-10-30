@@ -157,9 +157,12 @@ export class ExpenseController {
   getAllExpenses = async (req: any, res: Response) => {
     let err: Error | null = null, success;
     if (req && req?.user) {
-
+      if(req?.query?.filterData){
+        req.query.filterData = JSON.parse(req.query.filterData);
+      }
+      console.log(req.query,'req.query');
       [err, success] = await to(
-        this.expenseSevices.getAllExpenses(req.user.id)
+        this.expenseSevices.getAllExpenses(req.user.id,req?.query)
       );
     }
     if (err) return ReE(res, err, 422);

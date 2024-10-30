@@ -210,19 +210,75 @@ export class ExpenseSevices {
 
 
 
-  getAllExpenses = async (userId: number) => {
+  getAllExpensess = async (userId: number) => {
     let getExpensesErr: Error, getExpensesSuccess;
 
-      [getExpensesErr, getExpensesSuccess] = await to(
-        this.expensesModel.findAll({
-          where:{[Op.or]:[{userId:userId}]},
-          attributes:[
-            'id',
+    [getExpensesErr, getExpensesSuccess] = await to(
+      this.expensesModel.findAll({
+        where: {
+            userId: userId, // Filter by userId
+        },
+        attributes: [
+            [
+                Sequelize.literal(`
+                    CASE
+                        WHEN "Expenses"."created"::date = CURRENT_DATE THEN 'Today'
+                        WHEN "Expenses"."created"::date = CURRENT_DATE - INTERVAL '1 day' THEN 'Yesterday'
+                        ELSE TO_CHAR("Expenses"."created"::date, 'DD/MM/YYYY')
+                    END
+                `),
+                'display_date'
+            ],
             'spend',
             'reason',
-            'created',
-            'categoryId'
-          ],
+        ],
+        include: [
+            {
+                model: this.categoryModel,
+                attributes: [
+                    'id', 
+                    'categoryName', 
+                    'categoryImage'
+                ],
+                required: false, // LEFT OUTER JOIN
+            },
+        ],
+        order: [
+            [Sequelize.literal('"Expenses"."created"::date'), 'DESC'], // Order by date
+            ['spend', 'DESC'], // Then by spend
+        ],
+        raw: true // Fetch plain data
+    })
+    );
+    
+    
+    if (getExpensesErr) {
+      return TE(getExpensesErr.message, true);
+    }
+    return getExpensesSuccess;
+  }
+
+  
+  getAllExpenses = async (userId: number,query:{filterData:{customDateRange:{begin:Date,end:Date}}}) => {
+    let getExpensesErr: Error, getExpensesSuccess;
+    let date = new Date(), begin, end;
+
+    begin = query?.filterData?.customDateRange?.begin ?? new Date(date.getFullYear(), date.getMonth(), 1);
+    end = query?.filterData?.customDateRange?.end ?? new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    [getExpensesErr, getExpensesSuccess] = await to(
+      this.expensesModel.findAll({
+        where: {
+          [Op.or]: [{ userId: userId }],
+          created: { [Op.between]: [begin, end] }
+        },
+        attributes: [
+          'id',
+          'spend',
+          'reason',
+          'created',
+          'categoryId'
+        ],
           order: [['created', 'DESC']],
           include: [
             {
@@ -232,42 +288,7 @@ export class ExpenseSevices {
             },
           ]
         })
-      )
-    // [getExpensesErr, getExpensesSuccess] = await to(
-    //   this.categoryModel.findAll({
-    //     where: { [Op.or]: [{ userId: userId }, { userId: null }] },
-    //     attributes: [
-    //       "id",
-    //       "categoryName",
-    //       "categoryImage",
-    //       [sequelize.fn("sum", sequelize.col("spend")), "totalAmount"],
-    //     ],
-    //     include: [
-    //       {
-    //         required: false,
-    //         model: this.expensesModel,
-    //         attributes: ["id", "spend", "balance", "reason"],
-    //       },
-    //       {
-    //         model: this.categoryPlaningAmount,
-    //         required: false,
-    //         where: { userId: userId },
-    //         attributes: ["id", "planingAmount"],
-    //       },
-    //     ],
-    //     group: [
-    //       "Category.id",
-    //       "CategoryPlans.id",
-    //       "Category.category_name",
-    //       "Category.category_image",
-    //       "Expenses.id",
-    //       "Expenses.spend",
-    //       "Expenses.balance",
-    //       "Expenses.reason",
-    //     ],
-    //   })
-    // );
-
+      );
     if (getExpensesErr) {
       return TE(getExpensesErr.message, true);
     }
