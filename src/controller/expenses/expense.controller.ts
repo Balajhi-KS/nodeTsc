@@ -28,10 +28,10 @@ export class ExpenseController {
     let err: Error | null = null, success;
 
     if (req && req.body) {
-
+      console.log(req.user)
       const value = {
         categoryName: req.body.categoryName,
-        categoryImage: req.body.categoryImage,
+        categoryIcon: req.body.categoryIcon,
         planingAmount: req.body.planingAmount,
         userId: req.user.id,
       };
@@ -58,7 +58,7 @@ export class ExpenseController {
       } as createExpensePlaningInter;
       
       if(req.body.categoryName) value['categoryName'] = req.body.categoryName;
-      if(req.body.categoryImage) value['categoryImage'] = req.body.categoryImage;
+      if(req.body.categoryIcon) value['categoryIcon'] = req.body.categoryIcon;
       if(req.body.planingAmount) value['planingAmount'] = req.body.planingAmount;
        
       [err, success] = await to(this.expenseSevices.updateCategory(value));
@@ -97,7 +97,7 @@ export class ExpenseController {
         spend: body?.spendAmount,
         reason: body?.reason,
         userId: req.user["id"],
-        categoryId: body?.categoryId,
+        categoryIconId: body?.categoryIcon,
       };
       [err, success] = await to(this.expenseSevices.createDailyExpenses(data));
     }
@@ -119,7 +119,7 @@ export class ExpenseController {
         spend: body?.spendAmount,
         reason: body?.reason,
         userId: req.user["id"],
-        categoryId: body?.categoryId,
+        categoryId: body?.categoryIcon,
         id:body?.id
       };
       [err, success] = await to(this.expenseSevices.EditDailyExpenses(data));

@@ -39,6 +39,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       planingAmount: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue:0
       },
       userId: {
         type: DataTypes.INTEGER,

@@ -5,9 +5,8 @@ const expenseValidator = {
     body("categoryName")
       .isString()
       .withMessage("categoryName must be an String"),
-    body("categoryImage")
-      .isString()
-      .withMessage("categoryImage must be an String"),
+    body("categoryIcon").isArray()
+      .withMessage("categoryIcon must be an String"),
   ],
   createPlanningAmount: [
     body("planingAmount")

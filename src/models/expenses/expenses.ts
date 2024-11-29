@@ -1,6 +1,6 @@
 "use strict";
 
-import { Model, DataTypes, Sequelize } from "sequelize";
+import { Model, Sequelize } from "sequelize";
 
 interface ExpensesAttributes {
   id: number;
@@ -28,7 +28,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     // public categoryId!: number;
 
     static associate(models: any) {
-      Expenses.belongsTo(models.category, { foreignKey: "categoryId" });
+      Expenses.belongsTo(models.categoryIcon, { foreignKey: "categoryIconId" });
     }
   }
 

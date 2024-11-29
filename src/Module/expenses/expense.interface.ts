@@ -4,7 +4,7 @@ interface createExpense {
   spendAmount: number;
   Balance: number;
   reason: string;
-  categoryId: number;
+  categoryIcon: number;
   id:number
 }
 interface planingAmount {
@@ -14,7 +14,7 @@ interface planingAmount {
 }
 interface createCategoryInter{
   categoryName:string;
-  categoryImage:string;
+  categoryIcon:JSON;
   userId?:number;
   id?:number;
 }
@@ -26,7 +26,7 @@ interface createCategoryMappingTnter {
   dataValues: {
     id: number;
     categoryName: string;
-    categoryImage: string;
+    categoryIcon: string;
   };
 }
 

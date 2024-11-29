@@ -9,6 +9,7 @@ interface UserAttributes {
   lastName: string;
   userId: string;
   email: string;
+  userIncome: string;
   phone: number;
   created: Date;
   modified: Date;
@@ -24,6 +25,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public email!: string;
     public phone!: number;
     public password!: string;
+    public userIncome!: string;
     public created!: Date;
     public modified!: Date;
 
@@ -46,6 +48,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
           "userId",
           "email",
           "phone",
+          "userIncome",
           "password",
         ],
       });
@@ -96,6 +99,9 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       password: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      userIncome:{
+        type:DataTypes.STRING
       },
       created: {
         type: DataTypes.DATE,

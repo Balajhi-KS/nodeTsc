@@ -103,6 +103,8 @@ export class UserSevices {
       body.userName,
       body.password
     );
+    console.log(authenticatedUser,'llll');
+    
     if (authenticatedUser) {
       let expiration_time = parseInt("15000");
 
@@ -123,6 +125,7 @@ export class UserSevices {
         firstName: authenticatedUser.firstName,
         lastName: authenticatedUser.lastName,
         userId: authenticatedUser.userId,
+        income:authenticatedUser.userIncome,
         validateToken: token,
       };
       let jwtToken =

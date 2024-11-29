@@ -1,12 +1,13 @@
-import sequelize, {  Sequelize, Transaction, where } from "sequelize";
+import sequelize, { Sequelize, Transaction, where } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models";
-import { Op,col, fn } from "sequelize";
+import { Op, col, fn } from "sequelize";
 import { categoryCondition, CheckUserIdAlreadyExist, createCategoryInter, createCategoryMappingTnter, createExpensePlaningInter, planingAmount } from "../../Module";
 export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
   expensesModel: any = dbInstance.expenses;
   categoryPlaningAmount: any = dbInstance.categoryPlaningAmount;
+  categoryIcon: any = dbInstance.categoryIcon;
   /**
    * how you get your Sequelize instance
    */
@@ -30,7 +31,7 @@ export class ExpenseSevices {
       if (createCategorySuccess.dataValues.id) {
         let value = {
           planingAmount: data?.planingAmount,
-          userId: data.userId,
+          userId:  data.userId,
           categoryId: createCategorySuccess.dataValues.id,
         };
         [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
@@ -73,7 +74,7 @@ export class ExpenseSevices {
     const transaction: Transaction = await this.sequelize.transaction({ autocommit: false });
 
     try {
-      const array = ['categoryName', 'categoryImage'];
+      const array = ['categoryName', 'categoryIcon'];
 
       if (array.some((res) => data.hasOwnProperty(res))) {
 
@@ -155,7 +156,7 @@ export class ExpenseSevices {
         where: { [Op.or]: [{ userId: userId }, { userId: null }] },
         attributes: ['id',
           'categoryName',
-          'categoryImage',
+          'categoryIcon',
           [
             sequelize.literal(`(
             SELECT "planing_amount"
@@ -194,10 +195,11 @@ export class ExpenseSevices {
     let editDailyExpensesErr: Error, EditDailyExpensesSuccess;
 
     [editDailyExpensesErr, EditDailyExpensesSuccess] = await to(
-      this.expensesModel.update(data,{
-        where:{
-          id:data.id
-        }}
+      this.expensesModel.update(data, {
+        where: {
+          id: data.id
+        }
+      }
       )
     );
 
@@ -216,56 +218,56 @@ export class ExpenseSevices {
     [getExpensesErr, getExpensesSuccess] = await to(
       this.expensesModel.findAll({
         where: {
-            userId: userId, // Filter by userId
+          userId: userId, // Filter by userId
         },
         attributes: [
-            [
-                Sequelize.literal(`
+          [
+            Sequelize.literal(`
                     CASE
                         WHEN "Expenses"."created"::date = CURRENT_DATE THEN 'Today'
                         WHEN "Expenses"."created"::date = CURRENT_DATE - INTERVAL '1 day' THEN 'Yesterday'
                         ELSE TO_CHAR("Expenses"."created"::date, 'DD/MM/YYYY')
                     END
                 `),
-                'display_date'
-            ],
-            'spend',
-            'reason',
+            'display_date'
+          ],
+          'spend',
+          'reason',
         ],
         include: [
-            {
-                model: this.categoryModel,
-                attributes: [
-                    'id', 
-                    'categoryName', 
-                    'categoryImage'
-                ],
-                required: false, // LEFT OUTER JOIN
-            },
+          {
+            model: this.categoryModel,
+            attributes: [
+              'id',
+              'categoryName',
+              'categoryIcon'
+            ],
+            required: false, // LEFT OUTER JOIN
+          },
         ],
         order: [
-            [Sequelize.literal('"Expenses"."created"::date'), 'DESC'], // Order by date
-            ['spend', 'DESC'], // Then by spend
+          [Sequelize.literal('"Expenses"."created"::date'), 'DESC'], // Order by date
+          ['spend', 'DESC'], // Then by spend
         ],
         raw: true // Fetch plain data
-    })
+      })
     );
-    
-    
+
+
     if (getExpensesErr) {
       return TE(getExpensesErr.message, true);
     }
     return getExpensesSuccess;
   }
 
-  
-  getAllExpenses = async (userId: number,query:{filterData:{customDateRange:{begin:Date,end:Date}}}) => {
+
+  getAllExpenses = async (userId: number, query: { filterData: { customDateRange: { begin: Date, end: Date } } }) => {
     let getExpensesErr: Error, getExpensesSuccess;
     let date = new Date(), begin, end;
 
     begin = query?.filterData?.customDateRange?.begin ?? new Date(date.getFullYear(), date.getMonth(), 1);
     end = query?.filterData?.customDateRange?.end ?? new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    
+
     [getExpensesErr, getExpensesSuccess] = await to(
       this.expensesModel.findAll({
         where: {
@@ -277,18 +279,18 @@ export class ExpenseSevices {
           'spend',
           'reason',
           'created',
-          'categoryId'
+          'categoryIconId'
         ],
-          order: [['created', 'DESC']],
-          include: [
-            {
-              required: false,
-              model: this.categoryModel,
-              attributes: ["id", "categoryName", "categoryImage"],
-            },
-          ]
-        })
-      );
+        order: [['created', 'DESC']],
+        include: [
+          {
+            required: false,
+            model: this.categoryIcon,
+            attributes: ["id", "categoryIcon"],
+          },
+        ]
+      })
+    );
     if (getExpensesErr) {
       return TE(getExpensesErr.message, true);
     }
@@ -309,7 +311,7 @@ export class ExpenseSevices {
     [createCategoryMappingErr, createCategoryMappingSuccess] = await to(
       this.categoryModel.findAll({
         where: { userId: null },
-        attributes: ["id", "categoryName", "categoryImage"],
+        attributes: ["id", "categoryName", "categoryIcon"],
       })
     );
 
@@ -321,7 +323,7 @@ export class ExpenseSevices {
     for (let i = 0; i < createCategoryMappingSuccess.length; i++) {
       createNewMapping.push({
         categoryName: createCategoryMappingSuccess[i].dataValues.categoryName,
-        categoryImage: createCategoryMappingSuccess[i].dataValues.categoryName,
+        categoryIcon: createCategoryMappingSuccess[i].dataValues.categoryName,
         userId: user.dataValues.id
       });
     }
@@ -339,7 +341,7 @@ export class ExpenseSevices {
       this.categoryModel.findAll({
         where: { [Op.or]: [{ userId: userId }, { userId: null }] },
         attributes: [
-          'id', 
+          'id',
           'categoryName',
           [fn('COALESCE', fn('SUM', col('Expenses.spend')), 0), 'totalSpend']    // Sum the spend for each category
         ],
@@ -352,9 +354,9 @@ export class ExpenseSevices {
       })
     );
 
-      if(getAllSpendErr) return getAllSpendErr;
+    if (getAllSpendErr) return getAllSpendErr;
 
 
-      return getAllSpendSuccess;
+    return getAllSpendSuccess;
   }
 }

@@ -6,7 +6,6 @@ interface CategoryAttributes {
   id: number;
   userId: number;
   categoryName: string;
-  categoryImage: string;
   created: Date;
   modified: Date;
 }
@@ -19,12 +18,11 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public id!: number;
     public userId!: number;
     public categoryName!: string;
-    public categoryImage!: string;
     public created!: Date;
     public modified!: Date;
 
     static associate(models: any) {
-      Category.hasMany(models.expenses, { foreignKey: "categoryId" });
+      Category.hasMany(models.categoryIcon, { foreignKey: "categoryId" });
       Category.hasMany(models.categoryPlaningAmount, {
         foreignKey: "categoryId",
       });
@@ -44,10 +42,6 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       },
       userId: {
         type: DataTypes.INTEGER,
-      },
-      categoryImage: {
-        type: DataTypes.STRING,
-        allowNull: false,
       },
       created: {
         type: DataTypes.DATE,
