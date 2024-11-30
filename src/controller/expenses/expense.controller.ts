@@ -219,6 +219,8 @@ export class ExpenseController {
 
     this.router.post(
       "/daily/expenses",
+      expenseValidator.createDailyExpense,
+      validate,
       passport.authenticate("jwt", { session: false }),
       this.createDailyExpenses
     );

@@ -16,6 +16,11 @@ const expenseValidator = {
     .isNumeric()
     .withMessage("categoryId must be an Number"),
   ],
+  createDailyExpense:[
+    body('spendAmount').isNumeric().withMessage('spendAmount is invalid'),
+    body('reason').isString().withMessage('reason is invalid'),
+    body('categoryIcon').isNumeric().withMessage('categoryIcon is invalid'),
+  ]
 };
 
 export { expenseValidator };
