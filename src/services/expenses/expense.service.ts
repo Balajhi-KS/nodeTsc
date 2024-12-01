@@ -2,7 +2,14 @@ import sequelize, { Sequelize, Transaction, where } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models";
 import { Op, col, fn } from "sequelize";
-import { categoryCondition, CheckUserIdAlreadyExist, createCategoryInter, createCategoryMappingTnter, createExpensePlaningInter, planingAmount } from "../../Module";
+import {
+  categoryCondition,
+  CheckUserIdAlreadyExist,
+  createCategoryInter,
+  createCategoryMappingTnter,
+  createExpensePlaningInter,
+  planingAmount,
+} from "../../Module";
 export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
   expensesModel: any = dbInstance.expenses;
@@ -20,7 +27,9 @@ export class ExpenseSevices {
       createCategorySuccess,
       createCategoryPlanMappingErr: Error,
       createCategoryPlanMapping;
-    const transaction: Transaction = await this.sequelize.transaction({ autocommit: false });
+    const transaction: Transaction = await this.sequelize.transaction({
+      autocommit: false,
+    });
     try {
       [createCategoryErr, createCategorySuccess] = await to(
         this.categoryModel.create(data, { transaction: transaction })
@@ -31,7 +40,7 @@ export class ExpenseSevices {
       if (createCategorySuccess.dataValues.id) {
         let value = {
           planingAmount: data?.planingAmount,
-          userId:  data.userId,
+          userId: data.userId,
           categoryId: createCategorySuccess.dataValues.id,
         };
         [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
@@ -41,21 +50,26 @@ export class ExpenseSevices {
           return TE(createCategoryPlanMappingErr.message, true);
         }
       }
-      await transaction.commit()
+      await transaction.commit();
       return createCategorySuccess;
     } catch (err: any) {
       await transaction.rollback();
       return TE(err.message, true);
     }
     // });
-
   };
 
-  createExpensePlaning = async (data: createExpensePlaningInter | planingAmount, transaction?: Transaction) => {
+  createExpensePlaning = async (
+    data: createExpensePlaningInter | planingAmount,
+    transaction?: Transaction
+  ) => {
     let createExpensePlaningErr: Error, createExpensePlaningSuccess;
 
     [createExpensePlaningErr, createExpensePlaningSuccess] = await to(
-      this.categoryPlaningAmount.create(data, transaction ? { transaction: transaction } : {})
+      this.categoryPlaningAmount.create(
+        data,
+        transaction ? { transaction: transaction } : {}
+      )
     );
 
     if (createExpensePlaningErr)
@@ -63,77 +77,79 @@ export class ExpenseSevices {
     return createExpensePlaningSuccess;
   };
 
-
-
   updateCategory = async (data: createExpensePlaningInter) => {
     let createCategoryErr: Error,
       createCategorySuccess,
       createCategoryPlanMappingErr: Error,
       createCategoryPlanMapping;
 
-    const transaction: Transaction = await this.sequelize.transaction({ autocommit: false });
+    const transaction: Transaction = await this.sequelize.transaction({
+      autocommit: false,
+    });
 
     try {
-      const array = ['categoryName', 'categoryIcon'];
+      const array = ["categoryName", "categoryIcon"];
 
       if (array.some((res) => data.hasOwnProperty(res))) {
-
         [createCategoryErr, createCategorySuccess] = await to(
           this.categoryModel.update(data, {
             where: {
               id: data.id,
-              userId: data.userId
-            }, transaction: transaction
+              userId: data.userId,
+            },
+            transaction: transaction,
           })
         );
 
         if (createCategoryErr) {
           return TE(createCategoryErr.message, true);
         }
-
       }
 
-      if (data.hasOwnProperty('planingAmount') && data?.id) {
-
+      if (data.hasOwnProperty("planingAmount") && data?.id) {
         [createCategoryPlanMappingErr, createCategoryPlanMapping] = await to(
-          this.updateExpensePlaning({
-            planingAmount: data?.planingAmount,
-            categoryId: data?.id,
-            userId: data.userId
-          }, transaction)
+          this.updateExpensePlaning(
+            {
+              planingAmount: data?.planingAmount,
+              categoryId: data?.id,
+              userId: data.userId,
+            },
+            transaction
+          )
         );
 
         if (createCategoryPlanMappingErr) {
           return TE(createCategoryPlanMappingErr.message, true);
         }
-
       }
 
-      await transaction.commit()
+      await transaction.commit();
 
       return createCategorySuccess;
-
     } catch (err: any) {
-
       await transaction.rollback();
       return TE(err.message, true);
-
     }
   };
 
-  updateExpensePlaning = async (data: planingAmount, transaction?: Transaction) => {
+  updateExpensePlaning = async (
+    data: planingAmount,
+    transaction?: Transaction
+  ) => {
     let createExpensePlaningErr: Error, createExpensePlaningSuccess;
 
     [createExpensePlaningErr, createExpensePlaningSuccess] = await to(
       this.categoryPlaningAmount.findOrCreate({
         where: {
           userId: data.userId,
-          categoryId: data.categoryId
-        }, defaults: {
+          categoryId: data.categoryId,
+        },
+        defaults: {
           planingAmount: data.planingAmount,
           userId: data.userId,
-          categoryId: data.categoryId
-        }, transaction
+          categoryId: data.categoryId,
+        },
+        transaction,
       })
     );
 
@@ -143,10 +159,12 @@ export class ExpenseSevices {
     await createExpensePlaningSuccess[0].save();
 
     if (createExpensePlaningErr || !createExpensePlaningSuccess[0])
-      return TE(createExpensePlaningErr?.message ?? 'Unable to Update Category Details', true);
+      return TE(
+        createExpensePlaningErr?.message ?? "Unable to Update Category Details",
+        true
+      );
     return createExpensePlaningSuccess;
   };
-
 
   getAllCategory = async (userId: number) => {
     let getAllCategoryErr: Error, getAllCategorySuccess;
@@ -154,19 +172,28 @@ export class ExpenseSevices {
     [getAllCategoryErr, getAllCategorySuccess] = await to(
       this.categoryModel.findAll({
         where: { [Op.or]: [{ userId: userId }, { userId: null }] },
-        attributes: ['id',
-          'categoryName',
-          'categoryIcon',
-          [
-            sequelize.literal(`(
-            SELECT "planing_amount"
-            FROM "expenses"."categoryPlan"
-            WHERE "category_id" = "Category"."id"
-            LIMIT 1
-          )`),
-            'planingAmount'
-          ]],
-        raw: true
+        attributes: [
+          "id",
+          "categoryName",
+          // "categoryIcon",
+          // [
+          //   sequelize.literal(`(
+          //   SELECT "planing_amount"
+          //   FROM "expenses"."categoryPlan"
+          //   WHERE "category_id" = "Category"."id"
+          //   LIMIT 1
+          // )`),
+          //   "planingAmount",
+          // ],
+        ],
+        include: [
+          {
+            required: false,
+            model: this.categoryIcon,
+            attributes: ["id", "categoryIcon"],
+          },
+        ],
+        // raw: true,
       })
     );
 
@@ -190,17 +217,15 @@ export class ExpenseSevices {
     return createCategorySuccess;
   };
 
-
   EditDailyExpenses = async (data: any) => {
     let editDailyExpensesErr: Error, EditDailyExpensesSuccess;
 
     [editDailyExpensesErr, EditDailyExpensesSuccess] = await to(
       this.expensesModel.update(data, {
         where: {
-          id: data.id
-        }
-      }
-      )
+          id: data.id,
+        },
+      })
     );
 
     if (editDailyExpensesErr) {
@@ -209,8 +234,6 @@ export class ExpenseSevices {
 
     return EditDailyExpensesSuccess;
   };
-
-
 
   getAllExpensess = async (userId: number) => {
     let getExpensesErr: Error, getExpensesSuccess;
@@ -229,78 +252,76 @@ export class ExpenseSevices {
                         ELSE TO_CHAR("Expenses"."created"::date, 'DD/MM/YYYY')
                     END
                 `),
-            'display_date'
+            "display_date",
           ],
-          'spend',
-          'reason',
+          "spend",
+          "reason",
         ],
         include: [
           {
             model: this.categoryModel,
-            attributes: [
-              'id',
-              'categoryName',
-              'categoryIcon'
-            ],
+            attributes: ["id", "categoryName", "categoryIcon"],
             required: false, // LEFT OUTER JOIN
           },
         ],
         order: [
-          [Sequelize.literal('"Expenses"."created"::date'), 'DESC'], // Order by date
-          ['spend', 'DESC'], // Then by spend
+          [Sequelize.literal('"Expenses"."created"::date'), "DESC"], // Order by date
+          ["spend", "DESC"], // Then by spend
         ],
-        raw: true // Fetch plain data
+        raw: true, // Fetch plain data
       })
     );
 
-
-    if (getExpensesErr) {
-      return TE(getExpensesErr.message, true);
-    }
-    return getExpensesSuccess;
-  }
-
-
-  getAllExpenses = async (userId: number, query: { filterData: { customDateRange: { begin: Date, end: Date } } }) => {
-    let getExpensesErr: Error, getExpensesSuccess;
-    let date = new Date(), begin, end;
-
-    begin = query?.filterData?.customDateRange?.begin ?? new Date(date.getFullYear(), date.getMonth(), 1);
-    end = query?.filterData?.customDateRange?.end ?? new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    [getExpensesErr, getExpensesSuccess] = await to(
-      this.expensesModel.findAll({
-        where: {
-          [Op.or]: [{ userId: userId }],
-          created: { [Op.between]: [begin, end] }
-        },
-        attributes: [
-          'id',
-          'spend',
-          'reason',
-          'created',
-          'categoryIconId'
-        ],
-        order: [['created', 'DESC']],
-        include: [
-          {
-            required: false,
-            model: this.categoryIcon,
-            attributes: ["id", "categoryIcon"],
-          },
-        ]
-      })
-    );
     if (getExpensesErr) {
       return TE(getExpensesErr.message, true);
     }
     return getExpensesSuccess;
   };
 
+  getAllExpenses = async (
+    userId: number,
+    query: { filterData: { customDateRange: { begin: Date; end: Date } } }
+  ) => {
+    let getExpensesErr: Error, getExpensesSuccess;
+    let date = new Date(),
+      begin,
+      end;
+
+    begin =
+      query?.filterData?.customDateRange?.begin ??
+      new Date(date.getFullYear(), date.getMonth(), 1);
+    end =
+      query?.filterData?.customDateRange?.end ??
+      new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    console.log(userId, "userId");
+    [getExpensesErr, getExpensesSuccess] = await to(
+      this.expensesModel.findAll({
+        where: {
+          [Op.or]: [{ userId: userId }],
+          // created: { [Op.between]: [begin, end] },
+        },
+        attributes: ["id", "spend", "reason", "created", "categoryIconId"],
+        order: [["created", "DESC"]],
+        include: [
+          {
+            required: false,
+            model: this.categoryIcon,
+            attributes: ["id", "categoryIcon"],
+          },
+        ],
+      })
+    );
+    if (getExpensesErr) {
+      return TE(getExpensesErr.message, true);
+    }
+    console.log(getExpensesSuccess, "getExpensesSuccess");
+    return getExpensesSuccess;
+  };
+
   /**
-   * 
-   * @param user 
-   * @returns 
+   *
+   * @param user
+   * @returns
    */
   createCategoryMapping = async (user: CheckUserIdAlreadyExist) => {
     let createCategoryMappingErr: Error,
@@ -324,15 +345,16 @@ export class ExpenseSevices {
       createNewMapping.push({
         categoryName: createCategoryMappingSuccess[i].dataValues.categoryName,
         categoryIcon: createCategoryMappingSuccess[i].dataValues.categoryName,
-        userId: user.dataValues.id
+        userId: user.dataValues.id,
       });
     }
 
-    [addNewCreateCategoryErr, addNewCreateCategorySuccess] = await to(this.categoryModel.bulkCreate(createNewMapping));
+    [addNewCreateCategoryErr, addNewCreateCategorySuccess] = await to(
+      this.categoryModel.bulkCreate(createNewMapping)
+    );
 
     return createCategoryMappingSuccess;
-  }
-
+  };
 
   getSpendByCategory = async (userId: number) => {
     let getAllSpendErr, getAllSpendSuccess;
@@ -341,22 +363,23 @@ export class ExpenseSevices {
       this.categoryModel.findAll({
         where: { [Op.or]: [{ userId: userId }, { userId: null }] },
         attributes: [
-          'id',
-          'categoryName',
-          [fn('COALESCE', fn('SUM', col('Expenses.spend')), 0), 'totalSpend']    // Sum the spend for each category
+          "id",
+          "categoryName",
+          [fn("COALESCE", fn("SUM", col("Expenses.spend")), 0), "totalSpend"], // Sum the spend for each category
         ],
-        include: [{
-          model: this.expensesModel,
-          attributes: []  // No need to return individual expenses, just the total
-        }],
-        group: ['Category.id'],  // Group by category to calculate total per category
-        raw: true  // Fetch plain objects instead of Sequelize instances
+        include: [
+          {
+            model: this.expensesModel,
+            attributes: [], // No need to return individual expenses, just the total
+          },
+        ],
+        group: ["Category.id"], // Group by category to calculate total per category
+        raw: true, // Fetch plain objects instead of Sequelize instances
       })
     );
 
     if (getAllSpendErr) return getAllSpendErr;
 
-
     return getAllSpendSuccess;
-  }
+  };
 }
