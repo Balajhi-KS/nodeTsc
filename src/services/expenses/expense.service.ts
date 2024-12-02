@@ -306,7 +306,7 @@ export class ExpenseSevices {
           {
             required: false,
             model: this.categoryIcon,
-            attributes: ["id", "categoryIcon"],
+            attributes: ["id", "categoryIcon", "categoryId"],
           },
         ],
       })
