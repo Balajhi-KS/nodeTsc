@@ -14,7 +14,7 @@ export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
   expensesModel: any = dbInstance.expenses;
   categoryPlaningAmount: any = dbInstance.categoryPlaningAmount;
-  categoryIcon: any = dbInstance.categoryIcon;
+  // categoryIcon: any = dbInstance.categoryIcon;
   /**
    * how you get your Sequelize instance
    */
@@ -175,7 +175,7 @@ export class ExpenseSevices {
         attributes: [
           "id",
           "categoryName",
-          // "categoryIcon",
+          "categoryIcon",
           // [
           //   sequelize.literal(`(
           //   SELECT "planing_amount"
@@ -186,13 +186,7 @@ export class ExpenseSevices {
           //   "planingAmount",
           // ],
         ],
-        include: [
-          {
-            required: false,
-            model: this.categoryIcon,
-            attributes: ["id", "categoryIcon"],
-          },
-        ],
+      
         // raw: true,
       })
     );
@@ -298,15 +292,15 @@ export class ExpenseSevices {
       this.expensesModel.findAll({
         where: {
           [Op.or]: [{ userId: userId }],
-          // created: { [Op.between]: [begin, end] },
+          created: { [Op.between]: [begin, end] },
         },
-        attributes: ["id", "spend", "reason", "created", "categoryIconId"],
+        attributes: ["id", "spend", "reason", "created"],
         order: [["created", "DESC"]],
         include: [
           {
             required: false,
-            model: this.categoryIcon,
-            attributes: ["id", "categoryIcon", "categoryId"],
+            model: this.categoryModel,
+            attributes: ["id", "categoryIcon","categoryName"],
           },
         ],
       })

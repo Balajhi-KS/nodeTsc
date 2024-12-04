@@ -4,7 +4,7 @@ interface createExpense {
   spendAmount: number;
   Balance: number;
   reason: string;
-  categoryIcon: number;
+  categoryId: number;
   id:number
 }
 interface planingAmount {

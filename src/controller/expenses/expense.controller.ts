@@ -97,7 +97,7 @@ export class ExpenseController {
         spend: body?.spendAmount,
         reason: body?.reason,
         userId: req.user["id"],
-        categoryIconId: body?.categoryIcon,
+        categoryId: body?.categoryId,
       };
       [err, success] = await to(this.expenseSevices.createDailyExpenses(data));
     }
@@ -119,7 +119,7 @@ export class ExpenseController {
         spend: body?.spendAmount,
         reason: body?.reason,
         userId: req.user["id"],
-        categoryId: body?.categoryIcon,
+        categoryId: body?.categoryId,
         id:body?.id
       };
       [err, success] = await to(this.expenseSevices.EditDailyExpenses(data));

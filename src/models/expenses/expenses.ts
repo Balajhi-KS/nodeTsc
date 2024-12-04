@@ -5,7 +5,7 @@ import { Model, Sequelize } from "sequelize";
 interface ExpensesAttributes {
   id: number;
   spend: number;
-  balance: number;
+  // balance: number;
   userId: number;
   reason: string;
   created: Date;
@@ -20,7 +20,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
   {
     public id!: number;
     public spend!: number;
-    public balance!: number;
+    // public balance!: number;
     public userId!: number;
     public reason!: string;
     public created!: Date;
@@ -28,7 +28,8 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     // public categoryId!: number;
 
     static associate(models: any) {
-      Expenses.belongsTo(models.categoryIcon, { foreignKey: "categoryIconId" });
+      Expenses.belongsTo(models.category, { foreignKey: "categoryId" });
+      // Expenses.belongsTo(models.categoryIcon, { foreignKey: "categoryIconId" });
     }
   }
 
@@ -43,10 +44,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      balance: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
+      // balance: {
+      //   type: DataTypes.INTEGER,
+      //   allowNull: true,
+      // },
       reason: {
         type: DataTypes.STRING,
         allowNull: false,
