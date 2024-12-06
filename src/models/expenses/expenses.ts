@@ -8,6 +8,7 @@ interface ExpensesAttributes {
   // balance: number;
   userId: number;
   reason: string;
+  isIncome:boolean;
   created: Date;
   modified: Date;
   // categoryId: number;
@@ -23,6 +24,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     // public balance!: number;
     public userId!: number;
     public reason!: string;
+    public isIncome!:boolean;
     public created!: Date;
     public modified!: Date;
     // public categoryId!: number;
@@ -55,6 +57,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      isIncome: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
       },
       created: {
         type: DataTypes.DATE,

@@ -294,7 +294,7 @@ export class ExpenseSevices {
           [Op.or]: [{ userId: userId }],
           created: { [Op.between]: [begin, end] },
         },
-        attributes: ["id", "spend", "reason", "created"],
+        attributes: ["id", "spend", "reason", "created", "isIncome"],
         order: [["created", "DESC"]],
         include: [
           {

@@ -5,7 +5,9 @@ interface createExpense {
   Balance: number;
   reason: string;
   categoryId: number;
-  id:number
+  id:number;
+  isIncome?:boolean
+
 }
 interface planingAmount {
   planingAmount: number;
