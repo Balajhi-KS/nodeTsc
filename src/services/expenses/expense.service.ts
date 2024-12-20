@@ -1,7 +1,8 @@
-import sequelize, { Sequelize, Transaction, where } from "sequelize";
+import { Sequelize, Transaction, QueryTypes } from "sequelize";
 import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models";
 import { Op, col, fn } from "sequelize";
+import * as models from '../../models/index'
 import {
   categoryCondition,
   CheckUserIdAlreadyExist,
@@ -312,6 +313,42 @@ export class ExpenseSevices {
     return getExpensesSuccess;
   };
 
+  getTotalExpenseBalance = async (userId: number,query?: { filterData: { customDateRange: { begin: Date; end: Date } } }) => {
+    let getBalance, getBalanceErr;
+    let date = new Date(),
+    begin,
+    end;
+
+    begin =
+      query?.filterData?.customDateRange?.begin ??
+      new Date(date.getFullYear(), date.getMonth(), 1);
+    end =
+      query?.filterData?.customDateRange?.end ??
+      new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+      const excuteQuery = `
+      SELECT 
+          SUM(CASE WHEN is_income = TRUE THEN spend ELSE 0 END) + 
+          (SELECT CAST(user_income AS BIGINT) FROM "User".users WHERE id = :userId) AS "totalIncome",
+          SUM(CASE WHEN is_income = FALSE THEN spend ELSE 0 END) AS "totalSpend",
+          (SUM(CASE WHEN is_income = TRUE THEN spend ELSE 0 END) + (SELECT CAST(user_income AS BIGINT) FROM "User".users WHERE id = :userId)) - 
+          SUM(CASE WHEN is_income = FALSE THEN spend ELSE 0 END) AS "totalBalance"
+      FROM expenses.expenses 
+      WHERE user_id = :userId 
+        AND created BETWEEN :begin AND :end;
+    `;
+    
+    [getBalanceErr, getBalance] = await to(models.sequelize.query(excuteQuery, {
+      type: QueryTypes.SELECT,
+      replacements: { 
+        userId ,
+        begin: begin.toISOString(),
+        end: end.toISOString(),
+      },
+    }));
+    if (getBalanceErr) return TE(getBalanceErr.message, true);
+    return getBalance;
+  }
   /**
    *
    * @param user
