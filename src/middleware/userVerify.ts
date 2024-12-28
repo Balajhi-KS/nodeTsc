@@ -5,9 +5,7 @@ export class UserVerify {
   constructor() {
     this.commonService = new CommonSevices();
   }
-  checkUseToken = (header:string) => {
-    console.log(header);
-    
+  checkUseToken = (header:string) => {    
     const decryptData: string | null = this.commonService.decryptDetails(header);
     return JSON.parse(decryptData);
   };

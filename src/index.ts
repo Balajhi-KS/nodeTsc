@@ -27,7 +27,7 @@ class App {
     this.express.use(cors());
     this.express.use(helmet());
     this.userVerify = new UserVerify();
-    console.log(this.userVerify);
+    // console.log(this.userVerify);
     this.mountRoutes();
   }
   private mountRoutes(): void {
@@ -37,7 +37,7 @@ class App {
     this.express.use(bodyParser.json({ limit: "10mb" }));
     this.express.use(bodyParser.urlencoded({ extended: true }));
     this.express.use((req: any, res: Response, next: NextFunction): void => {
-      console.log(this.userVerify, "this.userVerify");
+      // console.log(this.userVerify, "this.userVerify");
       if (req && req.headers && req.headers.authorization) {
         const token = this.userVerify.checkUseToken(req.headers.authorization);
         req.headers.authorization = token?.jwtToken;

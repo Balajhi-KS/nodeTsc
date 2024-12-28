@@ -6,8 +6,10 @@ interface user {
   lastName: string;
   userId: string;
   email: string;
-  phone: string;
+  // phone: string;
+  planingAmount: string;
   password: string;
+  referralCode:string
 }
 interface name {
   firstName: string;
@@ -22,6 +24,7 @@ interface UserModelAttributes {
   email: string;
   phone: string;
   password: string;
+  referralCode: string;
   created: Date;
   modified: Date;
 }

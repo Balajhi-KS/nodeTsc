@@ -10,6 +10,7 @@ interface UserAttributes {
   userId: string;
   email: string;
   userIncome: string;
+  referralCode: string;
   phone: number;
   created: Date;
   modified: Date;
@@ -26,6 +27,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public phone!: number;
     public password!: string;
     public userIncome!: string;
+    public referralCode!: string;
     public created!: Date;
     public modified!: Date;
 
@@ -87,6 +89,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       userId: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      referralCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       email: {
         type: DataTypes.STRING,

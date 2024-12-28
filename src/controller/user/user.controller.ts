@@ -33,7 +33,7 @@ export class User {
     if (req && req.body) {
       [err, success] = await to(this.UserSevices.registerUser(req.body));
     }
-    if (err) return ReE(res, { message: "Unable to Register User" }, 422);
+    if (err) return ReE(res, { message: err.message }, 422);
     return Reponse(res, { success: "User Created successfully" }, 200);
   };
   /**
@@ -54,12 +54,22 @@ export class User {
     }
   };
 
+  mailAlreadyExist = async (req:Request,res:Response)=>{
+    let err: Error, mailExist;
+    console.log(req.body);
+    if(req?.body?.email && typeof req.body.email === 'string'){
+      [err, mailExist] = await to(this.UserSevices.checkUserAlreadyExist(req.body.email));
+      if(err) return ReE(res, err, 422);
+      return Reponse(res, mailExist, 200);;
+    }
+  }
   /**
    * Access router
    */
   get routes() {
     this.router.post("/register", this.registerUser);
     this.router.post("/login", this.loginUser);
+    this.router.post("/mailExist", this.mailAlreadyExist);
     this.router.get("/temp", (req, res) => {
       res.send(`Hello`);
     });

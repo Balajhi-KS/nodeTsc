@@ -1,4 +1,4 @@
-import { to } from "../../globalfunction";
+import { TE, to } from "../../globalfunction";
 import { dbInstance } from "../../models";
 import {
   CheckUserIdAlreadyExist,
@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { CommonSevices } from "../commonService/common.service";
 import { ExpenseSevices } from "../expenses/expense.service";
+import { Op } from "sequelize";
 export class UserSevices {
   userModel: any = dbInstance.user;
   userLoginDetailsModel: any = dbInstance.userLoginDetails;
@@ -34,23 +35,26 @@ export class UserSevices {
       this.createRandomUserId({
         firstName: body.firstName,
         lastName: body.lastName,
-      })
+      }, body.email, body.referralCode)
     );
-
+    if (createRandomErr) return TE(createRandomErr.message, true);
     let data = {
       firstName: body.firstName,
       lastName: body.lastName,
       userId: createRandomId,
       email: body.email,
-      phone: body.phone,
+      // phone: body.phone,
+      userIncome: body.planingAmount,
       password: body.password,
     };
 
+
+
     [userErr, user] = await to(this.userModel.create(data));
-    if (userErr) return userErr;
-    if(user){
-      this.expenseSevices.createCategoryMapping(user);
-    }
+    if (userErr) return TE(userErr.message, true);
+    // if (user) {
+    //   this.expenseSevices.createCategoryMapping(user);
+    // }
     return user;
   };
 
@@ -59,10 +63,10 @@ export class UserSevices {
    * @param req
    * @param res
    */
-  createRandomUserId = async (name: name) => {
+  createRandomUserId = async (name: name, email: string, referralCode: string) => {
     let randomUserId: string | null = null;
     let checkUserIdAleadyExistErr: Error,
-      checkUserIdAleadyExist: CheckUserIdAlreadyExist | null;
+      checkUserIdAleadyExist;
     let i: number | null = null;
     while (i != 0) {
       randomUserId = (
@@ -72,38 +76,89 @@ export class UserSevices {
         Math.floor(Math.random() * 10000)
       ).toLocaleLowerCase();
       [checkUserIdAleadyExistErr, checkUserIdAleadyExist] = await to(
-        this.checkAleadyExist(randomUserId)
+        this.checkAleadyExist(randomUserId, email, referralCode)
       );
       if (checkUserIdAleadyExistErr) {
-        return checkUserIdAleadyExistErr;
+        return TE(checkUserIdAleadyExistErr.message, true);
       }
-      if (checkUserIdAleadyExist == null) {
+      if (!checkUserIdAleadyExist.userIdExist) {
         break;
       }
     }
     return randomUserId;
   };
 
-  checkAleadyExist = async (userId: string) => {
+  checkAleadyExist = async (userId: string, email: string, referralCode: string) => {
     let checkUserIdAleadyExistErr: Error,
-      checkUserIdAleadyExist: CheckUserIdAlreadyExist | null;
-
+      checkUserIdAleadyExist: CheckUserIdAlreadyExist[] | null;
     [checkUserIdAleadyExistErr, checkUserIdAleadyExist] = await to(
-      this.userModel.findOne({
-        where: { userId: userId },
+      this.userModel.findAll({
+        where: {
+          [Op.or]: [
+            { email: email },
+            { userId: userId },
+            { referralCode: referralCode }
+          ],
+        },
       })
     );
+    if (checkUserIdAleadyExist) {
+      const { emailExists, userIdExists, referralCodeExists } = this.checkConflicts(checkUserIdAleadyExist, email, userId, referralCode);
 
-    if (checkUserIdAleadyExistErr) return checkUserIdAleadyExistErr;
+      if (emailExists) {
+        return TE('mail_Already_exist', true);
+      }
+      if (userIdExists) {
+        return { userIdExist: true };
+      }
+      if (!referralCodeExists) {
+        return TE('invalid_token', true);
+      }
+    }
+
+    if (checkUserIdAleadyExistErr) return TE(checkUserIdAleadyExistErr.message, true);
     return checkUserIdAleadyExist;
   };
 
+  checkConflicts = (records:CheckUserIdAlreadyExist[], email:string, userId:string, referralCode:string) => {
+
+    let emailExists = false;
+    let userIdExists = false;
+    let referralCodeExists = false;
+  
+    for (const record of records) {
+      const { email: recordEmail, userId: recordUserId, referralCode: recordReferralCode } = record.dataValues;
+  
+      if (recordEmail === email) {
+        emailExists = true;
+      }
+      if (recordUserId === userId) {
+        userIdExists = true;
+      }
+      if (recordReferralCode === referralCode) {
+        referralCodeExists = true;
+      }
+  
+      // Break early if all checks are done
+      if (emailExists && userIdExists && referralCodeExists) {
+        break;
+      }
+    }
+  
+    return { emailExists, userIdExists, referralCodeExists };
+  }
+
+
+  /**
+   * Login User using username and password
+   * @param body 
+   * @returns 
+   */
   loginUser = async (body:UserDetails) => {
     const authenticatedUser = await this.userModel.authenticate(
       body.userName,
       body.password
     );
-    console.log(authenticatedUser,'llll');
     
     if (authenticatedUser) {
       let expiration_time = parseInt("15000");
@@ -119,7 +174,7 @@ export class UserSevices {
         })
       );
 
-      if (createTokenErr) return createTokenErr.message;
+      if (createTokenErr) return TE(createTokenErr.message,true);
       const clonedObject = {
         id: authenticatedUser.id,
         firstName: authenticatedUser.firstName,
@@ -151,5 +206,15 @@ export class UserSevices {
     return (
       buffer.readUInt32LE(0).toString() + buffer.readUInt32LE(4).toString()
     );
+  }
+
+
+  checkUserAlreadyExist = async (param:string) => {
+    let err:Error,mailExist;
+    [err,mailExist] = await to(this.userModel.findOne({
+      where: { email: param }
+    }));
+    if (mailExist) return { mailAlreadyExist: true };
+    return { mailAlreadyExist: false };
   }
 }

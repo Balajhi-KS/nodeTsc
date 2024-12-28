@@ -28,7 +28,7 @@ export class ExpenseController {
     let err: Error | null = null, success;
 
     if (req && req.body) {
-      console.log(req.user)
+      // console.log(req.user)
       const value = {
         categoryName: req.body.categoryName,
         categoryIcon: req.body.categoryIcon,
@@ -135,7 +135,7 @@ export class ExpenseController {
 
   createExpensePlaning = async (req: any, res: Response) => {
     let err: Error | null = null, success, body: planingAmount;
-    console.log(req.body);
+    // console.log(req.body);
     if (req && req.body) {
       body = req.body;
       let data = {

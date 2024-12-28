@@ -275,7 +275,7 @@ export class ExpenseSevices {
 
   getAllExpenses = async (
     userId: number,
-    query: { filterData: { customDateRange: { begin: Date; end: Date } } }
+    query?: { limit: number, offset: number, filterData: { customDateRange: { begin: Date; end: Date } } }
   ) => {
     let getExpensesErr: Error, getExpensesSuccess;
     let date = new Date(),
@@ -290,13 +290,15 @@ export class ExpenseSevices {
       new Date(date.getFullYear(), date.getMonth() + 1, 0);
     console.log(userId, "userId");
     [getExpensesErr, getExpensesSuccess] = await to(
-      this.expensesModel.findAll({
+      this.expensesModel.findAndCountAll({
         where: {
           [Op.or]: [{ userId: userId }],
           created: { [Op.between]: [begin, end] },
         },
         attributes: ["id", "spend", "reason", "created", "isIncome"],
         order: [["created", "DESC"]],
+        limit:query?.limit ?? 20,
+        offset:query?.offset ?? 0,
         include: [
           {
             required: false,
@@ -309,7 +311,6 @@ export class ExpenseSevices {
     if (getExpensesErr) {
       return TE(getExpensesErr.message, true);
     }
-    console.log(getExpensesSuccess, "getExpensesSuccess");
     return getExpensesSuccess;
   };
 
@@ -326,18 +327,18 @@ export class ExpenseSevices {
       query?.filterData?.customDateRange?.end ??
       new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-      const excuteQuery = `
-      SELECT 
-          SUM(CASE WHEN is_income = TRUE THEN spend ELSE 0 END) + 
-          (SELECT CAST(user_income AS BIGINT) FROM "User".users WHERE id = :userId) AS "totalIncome",
-          SUM(CASE WHEN is_income = FALSE THEN spend ELSE 0 END) AS "totalSpend",
-          (SUM(CASE WHEN is_income = TRUE THEN spend ELSE 0 END) + (SELECT CAST(user_income AS BIGINT) FROM "User".users WHERE id = :userId)) - 
-          SUM(CASE WHEN is_income = FALSE THEN spend ELSE 0 END) AS "totalBalance"
-      FROM expenses.expenses 
-      WHERE user_id = :userId 
-        AND created BETWEEN :begin AND :end;
-    `;
-    
+    const excuteQuery = `
+        SELECT 
+          COALESCE(SUM(CASE WHEN is_income = TRUE THEN spend ELSE 0 END), 0) + 
+          COALESCE((SELECT CAST(user_income AS BIGINT) FROM "User".users WHERE id = :userId), 0) AS "totalIncome",
+          COALESCE(SUM(CASE WHEN is_income = FALSE THEN spend ELSE 0 END), 0) AS "totalSpend",
+          COALESCE(
+            COALESCE(SUM(CASE WHEN is_income = TRUE THEN spend ELSE 0 END), 0) + 
+            COALESCE((SELECT CAST(user_income AS BIGINT) FROM "User".users WHERE id = :userId), 0) - 
+            COALESCE(SUM(CASE WHEN is_income = FALSE THEN spend ELSE 0 END), 0),0) AS "totalBalance"
+          FROM expenses.expenses 
+          WHERE user_id = :userId AND created BETWEEN :begin AND :end; `;
+
     [getBalanceErr, getBalance] = await to(models.sequelize.query(excuteQuery, {
       type: QueryTypes.SELECT,
       replacements: { 
@@ -375,7 +376,7 @@ export class ExpenseSevices {
     for (let i = 0; i < createCategoryMappingSuccess.length; i++) {
       createNewMapping.push({
         categoryName: createCategoryMappingSuccess[i].dataValues.categoryName,
-        categoryIcon: createCategoryMappingSuccess[i].dataValues.categoryName,
+        categoryIcon: createCategoryMappingSuccess[i].dataValues.categoryIcon,
         userId: user.dataValues.id,
       });
     }
