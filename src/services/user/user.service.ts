@@ -5,6 +5,7 @@ import {
   name,
   user,
   UserDetails,
+  WhereCondition,
 } from "../../Module";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -180,7 +181,8 @@ export class UserSevices {
         firstName: authenticatedUser.firstName,
         lastName: authenticatedUser.lastName,
         userId: authenticatedUser.userId,
-        income:authenticatedUser.userIncome,
+        income: authenticatedUser.userIncome,
+        email:authenticatedUser.email,
         validateToken: token,
       };
       let jwtToken =
@@ -209,12 +211,33 @@ export class UserSevices {
   }
 
 
-  checkUserAlreadyExist = async (param:string) => {
-    let err:Error,mailExist;
-    [err,mailExist] = await to(this.userModel.findOne({
-      where: { email: param }
+  checkUserAlreadyExist = async (param: string, userId?: number) => {
+    let err: Error, mailExist;
+    let whereCondition:WhereCondition = {email: param};
+    if (userId && +userId) whereCondition.id = { [Op.not]: userId };
+
+    console.log(whereCondition);
+    [err, mailExist] = await to(this.userModel.findOne({
+      where: whereCondition
     }));
     if (mailExist) return { mailAlreadyExist: true };
+    return { mailAlreadyExist: false };
+  }
+
+
+  editUserDetails = async (body:any,userId: number) => {
+    let err: Error, editUser;
+    let updateUserDetails: WhereCondition = {};
+    if (body?.firstName) updateUserDetails['firstName'] = body.firstName;
+    if (body?.lastName) updateUserDetails['lastName'] = body.lastName;
+    if (body?.email) updateUserDetails['email'] = body.email;
+    if (body?.planingAmount) updateUserDetails['userIncome'] = body.planingAmount;
+
+    
+    [err,editUser] = await to(this.userModel.update(updateUserDetails,{
+      where: { id: userId }
+    }));
+    if (editUser) return { mailAlreadyExist: true };
     return { mailAlreadyExist: false };
   }
 }

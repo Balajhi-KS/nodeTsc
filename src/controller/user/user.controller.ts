@@ -8,6 +8,7 @@ import express, {
 import { UserSevices } from "../../services/user/user.service";
 import { ReE, Reponse, TE, to } from "../../globalfunction";
 import { CheckUserIdAlreadyExist } from "../../Module";
+import passport from "passport";
 
 export class User {
   private router: express.Router;
@@ -54,15 +55,25 @@ export class User {
     }
   };
 
-  mailAlreadyExist = async (req:Request,res:Response)=>{
+  mailAlreadyExist = async (req: any, res: Response) => {
     let err: Error, mailExist;
-    console.log(req.body);
-    if(req?.body?.email && typeof req.body.email === 'string'){
-      [err, mailExist] = await to(this.UserSevices.checkUserAlreadyExist(req.body.email));
-      if(err) return ReE(res, err, 422);
+    console.log(req?.user);
+    if (req?.body?.email && typeof req.body.email === 'string') {
+      [err, mailExist] = await to(this.UserSevices.checkUserAlreadyExist(req.body.email, req?.user?.id));
+      if (err) return ReE(res, err, 422);
       return Reponse(res, mailExist, 200);;
     }
   }
+
+  editUserDetails = async (req:any,res:Response)=>{
+    let err: Error, editUser;
+    if(req?.body && req?.user?.id){
+      [err, editUser] = await to(this.UserSevices.editUserDetails(req?.body,req?.user?.id));
+      if(err) return ReE(res, err, 422);
+      return Reponse(res, editUser, 200);;
+    }
+  }
+
   /**
    * Access router
    */
@@ -70,6 +81,8 @@ export class User {
     this.router.post("/register", this.registerUser);
     this.router.post("/login", this.loginUser);
     this.router.post("/mailExist", this.mailAlreadyExist);
+    this.router.post("/mail", passport.authenticate("jwt", { session: false }), this.mailAlreadyExist);
+    this.router.put("/edit",passport.authenticate("jwt", { session: false }), this.editUserDetails);
     this.router.get("/temp", (req, res) => {
       res.send(`Hello`);
     });

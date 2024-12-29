@@ -10,6 +10,7 @@ import {
   createCategoryMappingTnter,
   createExpensePlaningInter,
   planingAmount,
+  WhereCondition,
 } from "../../Module";
 export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
@@ -275,7 +276,7 @@ export class ExpenseSevices {
 
   getAllExpenses = async (
     userId: number,
-    query?: { limit: number, offset: number, filterData: { customDateRange: { begin: Date; end: Date } } }
+    query?: { limit: number, offset: number,categoryId:number, filterData: { customDateRange: { begin: Date; end: Date } } }
   ) => {
     let getExpensesErr: Error, getExpensesSuccess;
     let date = new Date(),
@@ -288,13 +289,16 @@ export class ExpenseSevices {
     end =
       query?.filterData?.customDateRange?.end ??
       new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    console.log(userId, "userId");
+     
+    let whereCondition:WhereCondition = {
+      [Op.or]: [{ userId: userId }],
+      created: { [Op.between]: [begin, end] }
+    };
+    if (query?.categoryId && +query?.categoryId) whereCondition['categoryId'] = +query?.categoryId;
+
     [getExpensesErr, getExpensesSuccess] = await to(
       this.expensesModel.findAndCountAll({
-        where: {
-          [Op.or]: [{ userId: userId }],
-          created: { [Op.between]: [begin, end] },
-        },
+        where: whereCondition,
         attributes: ["id", "spend", "reason", "created", "isIncome"],
         order: [["created", "DESC"]],
         limit:query?.limit ?? 20,

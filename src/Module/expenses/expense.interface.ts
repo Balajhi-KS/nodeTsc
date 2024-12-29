@@ -37,4 +37,7 @@ interface categoryCondition{
   whereCondition?:createCategoryInter
 }
 
-export { createExpense, planingAmount, createCategoryInter, createExpensePlaningInter,createCategoryMappingTnter,categoryCondition };
+interface WhereCondition {
+  [key: string]: any;
+}
+export { createExpense, planingAmount, createCategoryInter, createExpensePlaningInter, createCategoryMappingTnter, categoryCondition, WhereCondition };
