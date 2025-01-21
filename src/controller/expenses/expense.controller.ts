@@ -121,6 +121,7 @@ export class ExpenseController {
         reason: body?.reason,
         userId: req.user["id"],
         categoryId: body?.categoryId,
+        isIncome: body?.isIncome ?? false,
         id:body?.id
       };
       [err, success] = await to(this.expenseSevices.EditDailyExpenses(data));

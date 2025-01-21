@@ -15,7 +15,7 @@ const sequelize = new Sequelize({
   password: CONFIG.db_password,
   host: CONFIG.db_host,
   dialect: CONFIG.db_dialect,
-  port: 5432,
+  port: CONFIG.db_port,
   logging: false,
   define: {
     timestamps: false,
@@ -29,6 +29,9 @@ const sequelize = new Sequelize({
   },
   dialectOptions: {
     useUTC: true,
+    ssl:{
+      rejectUnauthorized: false,
+    }
   },
 });
 const schemaCreate = async function () {

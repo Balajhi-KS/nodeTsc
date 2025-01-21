@@ -61,7 +61,7 @@ export class User {
     if (req?.body?.email && typeof req.body.email === 'string') {
       [err, mailExist] = await to(this.UserSevices.checkUserAlreadyExist(req.body.email, req?.user?.id));
       if (err) return ReE(res, err, 422);
-      return Reponse(res, mailExist, 200);;
+      return Reponse(res, mailExist, 200);
     }
   }
 
@@ -70,7 +70,7 @@ export class User {
     if(req?.body && req?.user?.id){
       [err, editUser] = await to(this.UserSevices.editUserDetails(req?.body,req?.user?.id));
       if(err) return ReE(res, err, 422);
-      return Reponse(res, editUser, 200);;
+      return Reponse(res, editUser, 200);
     }
   }
 
