@@ -6,11 +6,11 @@ CONFIG.app = process.env.APP || "local";
 CONFIG.port = process.env.PORT || "3000";
 
 CONFIG.db_dialect = process.env.DB_DIALECT || "postgres";
-CONFIG.db_host = process.env.DB_HOST || "postgresql-arunramesh.alwaysdata.net";
-CONFIG.db_port = process.env.DB_PORT || "5432";
-CONFIG.db_name = process.env.DB_NAME || "arunramesh_343";
-CONFIG.db_user = process.env.DB_USER || "arunramesh";
-CONFIG.db_password = process.env.DB_PASSWORD || "arunRamesh@1234";
+CONFIG.db_host = process.env.DB_HOST || "pg-373bbad3-ssecond004-438b.g.aivencloud.com";
+CONFIG.db_port = process.env.DB_PORT || "17927";
+CONFIG.db_name = process.env.DB_NAME || "defaultdb";
+CONFIG.db_user = process.env.DB_USER || "avnadmin";
+CONFIG.db_password = process.env.DB_PASSWORD || "AVNS_FeoJZFDjn05Ckd15Bg6";
 
 CONFIG.max_pool_conn = process.env.MAX_POOL_CONN || "50";
 CONFIG.min_pool_conn = process.env.MIN_POOL_CONN || "0";

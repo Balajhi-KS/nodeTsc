@@ -418,4 +418,29 @@ export class ExpenseSevices {
 
     return getAllSpendSuccess;
   };
+
+  getExpenseFilter = async (userId: number, query?: { filterData: { customDateRange: { begin: Date; end: Date } } }) => {
+   let  getBalanceErr, getBalance;
+    const excuteQuery = `
+   SELECT TO_CHAR(dates.day, 'MM-DD') AS date,
+       COUNT(e.created) AS record_count
+        FROM generate_series(
+            :begin ::date, 
+            :end ::date, 
+            '1 day'::interval
+        ) AS dates(day)
+      LEFT JOIN expenses.expenses e
+      ON DATE(e.created) = dates.day
+      GROUP BY dates.day
+      ORDER BY dates.day;`;
+
+    [getBalanceErr, getBalance] = await to(models.sequelize.query(excuteQuery, {
+      type: QueryTypes.SELECT,
+      replacements: { 
+        userId ,
+        begin: begin.toISOString(),
+        end: end.toISOString(),
+      },
+    }));
+  }
 }

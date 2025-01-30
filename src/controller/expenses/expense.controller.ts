@@ -196,6 +196,17 @@ export class ExpenseController {
     return Reponse(res, { success: success?.[0] }, 200);
   }
 
+  getExpenseFilter = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+    if (req && req?.user) {
+      [err, success] = await to(
+        this.expenseSevices.getExpenseFilter(req.user.id)
+      );
+    }
+    if (err) return ReE(res, err, 422);
+    return Reponse(res, { success: success?.[0] }, 200);
+  }
+
   get routes() {
     this.app.use("/", this.router);
 
@@ -240,20 +251,10 @@ export class ExpenseController {
         passport.authenticate("jwt", { session: false }),
         this.createDailyExpenses
       );
-    // this.router.post(
-    //   "/daily/expenses",
-    //   expenseValidator.createDailyExpense,
-    //   validate,
-    //   passport.authenticate("jwt", { session: false }),
-    //   this.createDailyExpenses
-    // );
-
-    // this.router.put(
-    //   "/daily/expenses",
-    //   passport.authenticate("jwt", { session: false }),
-    //   this.EditDailyExpenses
-    // );
-
+      this.router.route("filter/expense").get(
+        passport.authenticate("jwt", { session: false }),
+        this.getExpenseFilter
+      );
     this.router.get("/totalBalance", 
       passport.authenticate("jwt", { session: false }), 
       this.getTotalExpenseBalance);
