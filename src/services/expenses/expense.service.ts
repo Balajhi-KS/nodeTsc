@@ -283,12 +283,13 @@ export class ExpenseSevices {
       begin,
       end;
 
-    begin =
+   begin =
       query?.filterData?.customDateRange?.begin ??
-      new Date(date.getFullYear(), date.getMonth(), 1);
+      new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
     end =
       query?.filterData?.customDateRange?.end ??
-      new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999));
+
      
     let whereCondition:WhereCondition = {
       [Op.or]: [{ userId: userId }],
