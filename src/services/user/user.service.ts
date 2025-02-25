@@ -12,6 +12,8 @@ import crypto from "crypto";
 import { CommonSevices } from "../commonService/common.service";
 import { ExpenseSevices } from "../expenses/expense.service";
 import { Op } from "sequelize";
+import memoryCache from "../../middleware/memory.cache";
+
 export class UserSevices {
   userModel: any = dbInstance.user;
   userLoginDetailsModel: any = dbInstance.userLoginDetails;
@@ -162,10 +164,10 @@ export class UserSevices {
     );
     
     if (authenticatedUser) {
-      let expiration_time = parseInt("15000");
 
       const keyPair = this.commonSevices.generateRSAKeys();
       const token = this.generateRandomCodeSecure();
+      memoryCache.set('tokenId_' + authenticatedUser.id, token);
       const [createTokenErr, createToken] = await to(
         this.userLoginDetailsModel.create({
           userToken: token,
@@ -188,7 +190,7 @@ export class UserSevices {
       let jwtToken =
         "Bearer " +
         jwt.sign(clonedObject, (process.env.SECRETKEY as string), {
-          expiresIn: expiration_time,
+          expiresIn: process.env.JWT_EXPIRATION,
         });
 
       return {
