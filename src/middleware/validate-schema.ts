@@ -1,8 +1,15 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { validationResult } from "express-validator";
+import { validationResult, checkExact, matchedData } from "express-validator";
 import memoryCache from "./memory.cache";
 
-const validate: RequestHandler = (req:Request, res:Response, next:NextFunction) => {
+const validate: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  await checkExact(
+    [], {
+    message: fields => {
+      const [field] = fields;
+      return `Unknown field ${field.path} in ${field.location} with value ${field.value}`;
+    }, locations: ['body', 'query', 'params']
+  }).run(req);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({

@@ -203,8 +203,9 @@ export class ExpenseController {
         this.expenseSevices.getExpenseFilter(req.user.id)
       );
     }
+    console.log(success)
     if (err) return ReE(res, err, 422);
-    return Reponse(res, { success: success?.[0] }, 200);
+    return Reponse(res, { success: success }, 200);
   }
 
   get routes() {
@@ -251,7 +252,7 @@ export class ExpenseController {
         passport.authenticate("jwt", { session: false }),
         this.createDailyExpenses
       );
-      this.router.route("filter/expense").get(
+      this.router.route("/filter/expense").get(
         passport.authenticate("jwt", { session: false }),
         this.getExpenseFilter
       );

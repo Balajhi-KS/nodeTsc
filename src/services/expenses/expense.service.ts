@@ -220,6 +220,7 @@ export class ExpenseSevices {
       this.expensesModel.update(data, {
         where: {
           id: data.id,
+          userId:data.userId
         },
       })
     );
@@ -421,17 +422,22 @@ export class ExpenseSevices {
   };
 
   getExpenseFilter = async (userId: number, query?: { filterData: { customDateRange: { begin: Date; end: Date } } }) => {
-   let  getBalanceErr, getBalance;
+    let getBalanceErr, getBalance;
+    const getFilterDate = this.getFilterDate();
+    console.log(getFilterDate);
+    const start = query?.filterData?.customDateRange?.begin ? query?.filterData?.customDateRange.begin.toISOString() : getFilterDate.start;
+    const end = query?.filterData?.customDateRange?.end ? query?.filterData.customDateRange.end.toISOString() : getFilterDate.end;
+    
     const excuteQuery = `
    SELECT TO_CHAR(dates.day, 'MM-DD') AS date,
-       COUNT(e.created) AS record_count
+       COALESCE(SUM(e.spend), 0) AS value
         FROM generate_series(
             :begin ::date, 
             :end ::date, 
             '1 day'::interval
         ) AS dates(day)
       LEFT JOIN expenses.expenses e
-      ON DATE(e.created) = dates.day
+      ON DATE(e.created) = dates.day AND e.user_id =:userId
       GROUP BY dates.day
       ORDER BY dates.day;`;
 
@@ -439,9 +445,27 @@ export class ExpenseSevices {
       type: QueryTypes.SELECT,
       replacements: { 
         userId ,
-        begin: begin.toISOString(),
-        end: end.toISOString(),
+        begin: start,
+        end: end
       },
     }));
+    if (getBalanceErr) return getBalanceErr;
+    console.log(getBalance, 'getBalance');
+    return getBalance;
+  }
+
+  getFilterDate = () => {
+    let date = new Date();
+    let dayOfWeek = date.getDay();
+    let currentDate = date.getDate();
+    let startOfWeek = new Date(date);
+    startOfWeek.setDate(currentDate - dayOfWeek);
+    let endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    return {
+        start: startOfWeek.toLocaleDateString(),
+        end: endOfWeek.toLocaleDateString()
+    }
+  
   }
 }

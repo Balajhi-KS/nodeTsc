@@ -188,10 +188,11 @@ export class UserSevices {
         validateToken: token,
       };
       let jwtToken =
-        "Bearer " +
-        jwt.sign(clonedObject, (process.env.SECRETKEY as string), {
-          expiresIn: process.env.JWT_EXPIRATION,
-        });
+      "Bearer " +
+      jwt.sign(clonedObject, (process.env.SECRETKEY as string), {
+        expiresIn: process.env.JWT_EXPIRATION,
+      });
+      console.log('jwtToken: ', jwtToken);
 
       return {
         data: {
