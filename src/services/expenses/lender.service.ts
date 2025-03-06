@@ -2,13 +2,20 @@ import { Sequelize, QueryTypes } from "sequelize";
 import { dbInstance } from "../../models";
 import { TE, to } from "../../globalfunction";
 import * as models from '../../models/index'
-import { createLenderAmount, createLenderDetails } from "../../rawQuery/expenses/Lender.query";
+import { createLenderAmount, createLenderDetails, getLenderDetails } from "../../rawQuery/expenses/Lender.query";
 
 export class LenderService {
     private sequelize: Sequelize = dbInstance.sequelize;
 
     getLenderDetails = async (userId: number) => {
-        
+        const [err, response] = await to(models.sequelize.query(getLenderDetails, {
+            type: QueryTypes.SELECT,
+            replacements: {
+                userId
+            }
+        }));
+        if (err) return TE(err.message, true);
+        return response;
     }
 
     createLenderDetails = async (userId: number, body: { name: string }) => {

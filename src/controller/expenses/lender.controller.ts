@@ -54,6 +54,7 @@ export class LenderController {
     get routes() {
         this.router.route('/user')
             .get(
+                lenderValidator.getLenderDetails,validate,
                 passport.authenticate("jwt", { session: false }),
                 this.getLenderDetails)
             .post(

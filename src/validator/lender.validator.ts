@@ -1,6 +1,11 @@
-import { body } from "express-validator";
+import { body, param, query } from "express-validator";
 
 const lenderValidator = {
+    getLenderDetails: [
+        body('*').isEmpty().withMessage('body data not allowed'),
+        query('*').isEmpty().withMessage('query data not allowed'),
+        param('*').isEmpty().withMessage('query data not allowed'),
+    ],
     createLenderDetails: [
         body('name').notEmpty().isString().withMessage('Name must be a string')
     ],
