@@ -63,6 +63,17 @@ export class LenderController {
         return Reponse(res, { success: success }, 200);
     }
 
+    updateLendingAmount = async (req: any, res: Response) => {
+        let err: Error | null = null, success;
+        if (req && req?.user) {
+            [err, success] = await to(
+                this.lenderService.updateLendingAmount(req.user.id, req?.body)
+            );
+        }
+        if (err) return ReE(res, err, 422);
+        return Reponse(res, { success: success }, 200);
+    }
+
     get routes() {
         this.router.route('/user')
             .get(
@@ -79,13 +90,22 @@ export class LenderController {
         //     this.getLenderExpense);
         this.router.route('/')
             .get(
-               this.getUserLendingDetails 
+                lenderValidator.getLenderAmountDetails, 
+                validate,
+                passport.authenticate("jwt", { session: false }),
+                this.getUserLendingDetails
             )
             .post(
                 lenderValidator.createLendingAmount,
                 validate,
                 passport.authenticate("jwt", { session: false }),
                 this.createLendingAmount
+            ) 
+            .put(
+                lenderValidator.updateLendingAmount,
+                validate,
+                passport.authenticate("jwt", { session: false }),
+                this.updateLendingAmount
             );
         return this.router;
     }
