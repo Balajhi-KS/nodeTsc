@@ -20,6 +20,7 @@ const expenseValidator = {
     body('spendAmount').isNumeric().withMessage('spendAmount is invalid'),
     body('reason').isString().withMessage('reason is invalid'),
     body('categoryId').isNumeric().withMessage('categoryId is invalid'),
+    body('isIncome').isBoolean().withMessage('isIncome is invalid')
   ]
 };
 

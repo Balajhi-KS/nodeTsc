@@ -1,5 +1,7 @@
 import { Strategy, ExtractJwt,StrategyOptions, VerifiedCallback } from "passport-jwt";
 import passport from "passport";
+import memoryCache from "./memory.cache";
+import { NextFunction, Request, Response } from "express";
 
 const JwtStrategy = Strategy;
 interface JwtPayload {
@@ -16,11 +18,19 @@ const jwtOptions:StrategyOptions = {
 // Usage example for the JwtStrategy
 passport.use(
   new JwtStrategy(jwtOptions, async (jwtPayload:JwtPayload, done:VerifiedCallback) => {
-    if (jwtPayload) {
+    if (jwtPayload && checkIfUserValid(jwtPayload)) {
       return done(null, jwtPayload);
     } else {
       return done(null, false);
     }
   })
 );
+const checkIfUserValid = (req: Request | any) => {
+  const getTokenBy= 'tokenId_' + req?.id;
+  const memory = memoryCache.get(getTokenBy);
+  if ((memory !== req?.validateToken) || !memory) {
+    return false;
+  }
+  return true;
+}
 export { passport };
