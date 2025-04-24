@@ -21,5 +21,18 @@ WHERE le.lend_user_id=:lenderId and EXISTS (
 ) ORDER BY created DESC ;`;
 
 export const updateLendingAmount=`
-UPDATE expenses."lendExpense" le SET amount = :amount FROM expenses."lendUserDetail" lud WHERE le.id = :id AND lud.user_id = :lenderId AND lud.id = le.lend_user_id;
-`
+UPDATE expenses."lendExpense" le SET amount = :amount FROM expenses."lendUserDetail" lud WHERE le.id = :id AND lud.user_id = :userId AND lud.id = le.lend_user_id;
+`;
+
+export const createExpenses = `INSERT INTO expenses.expenses (spend,reason,is_income,user_id) select spend, reason, isIncome, :userId from json_to_recordset(:expenseData) AS x(isIncome BOOLEAN, reason TEXT, spendAmount NUMERIC)`;
+export const createLending = ``;
+
+// {
+//     "expenseData": [
+//       { "isIncome": false, "isLending": false, "reason": "Groceries", "spendAmount": "3000" }
+//     ],
+//     "lendingData": [
+//       { "isIncome": true, "isLending": true, "reason": "Rent", "spendAmount": "1500" }
+//     ]
+//   }
+  

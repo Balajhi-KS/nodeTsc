@@ -40,4 +40,16 @@ interface categoryCondition{
 interface WhereCondition {
   [key: string]: any;
 }
-export { createExpense, planingAmount, createCategoryInter, createExpensePlaningInter, createCategoryMappingTnter, categoryCondition, WhereCondition };
+interface TransactionItem {
+  isIncome: boolean;
+  isLending: boolean;
+  reason: string;
+  spendAmount: number | string; 
+}
+
+interface TransactionPayload {
+  expenseData: TransactionItem[];
+  lendingData: TransactionItem[];
+}
+
+export { TransactionPayload, createExpense, planingAmount, createCategoryInter, createExpensePlaningInter, createCategoryMappingTnter, categoryCondition, WhereCondition };
