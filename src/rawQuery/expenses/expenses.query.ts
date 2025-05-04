@@ -5,4 +5,5 @@ WITH inserted_lend AS (
     RETURNING id, amount
 )
 INSERT INTO expenses."expenses" (spend, reason, user_id, is_income)
-SELECT inserted_lend.amount::INTEGER, 'paid to arun', 2, false FROM inserted_lend returning *;`
+SELECT inserted_lend.amount::INTEGER, 'paid to arun', 2, false FROM inserted_lend returning *;`;
+export const createExpenses = `INSERT INTO expenses.expenses (spend,reason,is_income,user_id,created,modified,category_id) select spend, reason, "isIncome", :userId,Now(),Now(),:categoryId from json_to_recordset(:expenseData) AS x("isIncome" BOOLEAN, reason TEXT, spend NUMERIC)`;

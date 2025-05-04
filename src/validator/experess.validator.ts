@@ -21,7 +21,15 @@ const expenseValidator = {
     body('reason').isString().withMessage('reason is invalid'),
     body('categoryId').isNumeric().withMessage('categoryId is invalid'),
     body('isIncome').isBoolean().withMessage('isIncome is invalid')
-  ]
+  ],
+  transactionValidator : [
+      body('*.isIncome')
+        .isBoolean().withMessage('isIncome must be a boolean'),
+      body('*.reason')
+        .isString().notEmpty().withMessage('reason is required'),
+      body('*.spend')
+        .isString().withMessage('spend must be a number')
+    ]
 };
 
 export { expenseValidator };

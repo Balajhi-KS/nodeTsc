@@ -208,6 +208,17 @@ export class ExpenseController {
     return Reponse(res, { success: success }, 200);
   }
 
+  lendingExpenseBulkCreate = async (req: any, res: Response) => {
+    let err: Error | null = null, success;
+    if (req && req?.user) {
+        [err, success] = await to(
+            this.expenseSevices.lendingExpenseBulkCreate(req.user.id, req?.body)
+        );
+    }
+    if (err) return ReE(res, err, 422);
+    return Reponse(res, { success: success }, 200);
+  }
+  
   get routes() {
     this.app.use("/", this.router);
 
@@ -227,7 +238,13 @@ export class ExpenseController {
         passport.authenticate("jwt", { session: false }),
         this.updateCategory
       );
-
+    this.router.route('/message')
+      .post(
+        expenseValidator.transactionValidator,
+        validate,
+        passport.authenticate("jwt", { session: false }),
+        this.lendingExpenseBulkCreate
+      );
     this.router.get(
       "/all",
       passport.authenticate("jwt", { session: false }),

@@ -10,8 +10,10 @@ import {
   createCategoryMappingTnter,
   createExpensePlaningInter,
   planingAmount,
+  TransactionPayload,
   WhereCondition,
 } from "../../Module";
+import { createExpenses } from "../../rawQuery/expenses/expenses.query";
 export class ExpenseSevices {
   categoryModel: any = dbInstance.category;
   expensesModel: any = dbInstance.expenses;
@@ -468,4 +470,19 @@ export class ExpenseSevices {
     }
   
   }
+
+  lendingExpenseBulkCreate = async (userId: number, body: TransactionPayload) => {
+    console.log('body: ', body);
+    const [getLendAmountErr, getLendAmount] = await to(models.sequelize.query(createExpenses, {
+      type: QueryTypes.INSERT,
+      replacements:
+      {
+        expenseData: JSON.stringify(body),
+        userId,
+        categoryId: 1
+      }
+    }));
+    if (getLendAmountErr) return TE(getLendAmountErr?.message ?? 'Please enter valid details', true);
+    return getLendAmount[0];
+}
 }

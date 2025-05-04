@@ -2,7 +2,7 @@ import { Sequelize, QueryTypes } from "sequelize";
 import { dbInstance } from "../../models";
 import { TE, to } from "../../globalfunction";
 import * as models from '../../models/index'
-import { createLenderAmount, createLenderDetails, getLendAmountQuery, getLenderDetails, updateLendingAmount } from "../../rawQuery/expenses/Lender.query";
+import { createExpenses, createLenderAmount, createLenderDetails, getLendAmountQuery, getLenderDetails, updateLendingAmount } from "../../rawQuery/expenses/Lender.query";
 import { TransactionPayload } from "../../Module";
 
 export class LenderService {
@@ -66,7 +66,7 @@ export class LenderService {
             replacements: data
         }));
         if (getLendAmountErr) return TE(getLendAmountErr?.message ?? 'Please enter valid details', true);
-        return getLendAmount[0];
+        return getLendAmount;
     }
 
     updateLendingAmount = async (userId: number, body: { id: number, lenderId: number, amount: string }) => {
@@ -86,17 +86,5 @@ export class LenderService {
         return updateLendAmount[1];
     }
 
-    lendingExpenseBulkCreate = async (userId: number, body: TransactionPayload) => {
-        const { expenseData } = body;
-        const [getLendAmountErr, getLendAmount] = await to(models.sequelize.query(getLendAmountQuery, {
-            type: QueryTypes.INSERT,
-            replacements:
-            {
-                transactions: JSON.stringify(expenseData),
-                userId
-            }
-        }));
-        if (getLendAmountErr) return TE(getLendAmountErr?.message ?? 'Please enter valid details', true);
-        return getLendAmount[0];
-    }
+
 }

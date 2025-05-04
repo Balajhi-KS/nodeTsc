@@ -24,7 +24,7 @@ export const updateLendingAmount=`
 UPDATE expenses."lendExpense" le SET amount = :amount FROM expenses."lendUserDetail" lud WHERE le.id = :id AND lud.user_id = :userId AND lud.id = le.lend_user_id;
 `;
 
-export const createExpenses = `INSERT INTO expenses.expenses (spend,reason,is_income,user_id) select spend, reason, isIncome, :userId from json_to_recordset(:expenseData) AS x(isIncome BOOLEAN, reason TEXT, spendAmount NUMERIC)`;
+export const createExpenses = `INSERT INTO expenses.expenses (spend,reason,is_income,user_id,created,modified) select spend, reason, "isIncome", :userId,Now(),Now() from json_to_recordset(:expenseData) AS x("isIncome" BOOLEAN, reason TEXT, spend NUMERIC)`;
 export const createLending = ``;
 
 // {
