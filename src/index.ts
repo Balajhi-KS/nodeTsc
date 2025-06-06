@@ -16,7 +16,7 @@ import { passport } from "./middleware/passport";
 import { UserVerify } from "./middleware/userVerify";
 import logger from "morgan";
 
-dotenv.config();
+dotenv.config(); 
 class App {
   public express: express.Application;
   public userVerify: UserVerify;
